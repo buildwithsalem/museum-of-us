@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Museum of Us</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@300;400&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #c9a84c;
+      --gold-light: #e8d48a;
+      --dark: #0a0806;
+      --warm: #1a1208;
+      --cream: #f5ead6;
+      --red-velvet: #3d0d0d;
+    }
+
+    body {
+      background: #000;
+      color: var(--cream);
+      font-family: 'Cormorant Garamond', serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      cursor: default;
+    }
+
+    /* ─── LANDING PAGE ─── */
+    #landing {
+      position: fixed; inset: 0; z-index: 100;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: radial-gradient(ellipse at center, #1a1005 0%, #000 70%);
+      transition: opacity 1.8s ease;
+    }
+    #landing.fade-out { opacity: 0; pointer-events: none; }
+
+    .landing-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1.8rem, 5vw, 3.5rem);
+      font-weight: 300;
+      letter-spacing: 0.25em;
+      color: var(--cream);
+      text-align: center;
+      margin-bottom: 0.3em;
+      opacity: 0;
+      animation: fadeUp 2s ease 0.5s forwards;
+    }
+    .landing-sub {
+      font-style: italic;
+      font-size: clamp(0.9rem, 2vw, 1.2rem);
+      color: var(--gold);
+      letter-spacing: 0.15em;
+      opacity: 0;
+      animation: fadeUp 2s ease 1s forwards;
+      margin-bottom: 3rem;
+    }
+    .enter-btn {
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.4em;
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      background: transparent;
+      padding: 1rem 2.5rem;
+      cursor: pointer;
+      opacity: 0;
+      animation: fadeUp 2s ease 1.6s forwards;
+      transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+      text-transform: uppercase;
+    }
+    .enter-btn:hover {
+      background: var(--gold);
+      color: #000;
+      box-shadow: 0 0 30px rgba(201,168,76,0.4);
+    }
+    .candle-row {
+      display: flex; gap: 3rem; margin-top: 3rem;
+      opacity: 0; animation: fadeUp 2s ease 2s forwards;
+    }
+    .candle { font-size: 1.4rem; animation: flicker 2s ease-in-out infinite alternate; }
+    .candle:nth-child(2) { animation-delay: 0.5s; }
+    .candle:nth-child(3) { animation-delay: 1s; }
+
+    /* ─── 3D CANVAS ─── */
+    #canvas-container {
+      position: fixed; inset: 0; z-index: 1;
+    }
+    #three-canvas { display: block; width: 100%; height: 100%; }
+
+    /* ─── DARK OVERLAY for letter moments ─── */
+    #dark-overlay {
+      position: fixed; inset: 0; z-index: 50;
+      background: rgba(0,0,0,0.85);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.8s ease;
+    }
+    #dark-overlay.active { opacity: 1; pointer-events: all; }
+
+    /* ─── MEMORY PANEL ─── */
+    #memory-panel {
+      position: fixed; inset: 0; z-index: 60;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.6s ease;
+    }
+    #memory-panel.open { opacity: 1; pointer-events: all; }
+
+    .memory-card {
+      background: linear-gradient(160deg, #1a1208, #0f0b06);
+      border: 1px solid var(--gold);
+      max-width: 520px; width: 90%;
+      padding: 2.5rem;
+      position: relative;
+      box-shadow: 0 0 60px rgba(201,168,76,0.15), inset 0 0 40px rgba(0,0,0,0.5);
+    }
+    .memory-card::before {
+      content: ''; position: absolute;
+      top: 8px; left: 8px; right: 8px; bottom: 8px;
+      border: 1px solid rgba(201,168,76,0.2);
+      pointer-events: none;
+    }
+    .memory-photo {
+      width: 100%; aspect-ratio: 4/3; object-fit: cover;
+      background: linear-gradient(135deg, #2a1a0a, #1a0d0a);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem; margin-bottom: 1.5rem;
+      border: 1px solid rgba(201,168,76,0.3);
+      overflow: hidden;
+    }
+    .memory-photo img { width: 100%; height: 100%; object-fit: cover; }
+    .memory-date {
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem; letter-spacing: 0.3em;
+      color: var(--gold); margin-bottom: 0.5rem;
+    }
+    .memory-caption {
+      font-size: 1.1rem; font-style: italic;
+      line-height: 1.7; color: var(--cream);
+      margin-bottom: 1.2rem;
+    }
+    .voice-btn {
+      font-family: 'Cinzel', serif; font-size: 0.72rem;
+      letter-spacing: 0.25em; color: var(--gold);
+      border: 1px solid var(--gold); background: transparent;
+      padding: 0.6rem 1.4rem; cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+    }
+    .voice-btn:hover { background: var(--gold); color: #000; }
+    .close-btn {
+      position: absolute; top: 1rem; right: 1.2rem;
+      background: none; border: none; color: var(--gold);
+      font-size: 1.4rem; cursor: pointer; opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    .close-btn:hover { opacity: 1; }
+
+    /* ─── LETTER ─── */
+    #floating-letter {
+      position: fixed; z-index: 55;
+      pointer-events: all; cursor: pointer;
+      opacity: 0; transition: opacity 1s ease;
+      animation: float 3s ease-in-out infinite;
+      transform-origin: center;
+    }
+    #floating-letter.visible { opacity: 1; }
+    .letter-inner {
+      font-size: 3.5rem;
+      filter: drop-shadow(0 0 20px rgba(201,168,76,0.8));
+      animation: glow-pulse 2s ease-in-out infinite alternate;
+    }
+
+    /* ─── LETTER ARCHIVE ─── */
+    #archive-btn {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 70;
+      background: none; border: 1px solid var(--gold);
+      color: var(--gold); width: 50px; height: 50px;
+      font-size: 1.4rem; cursor: pointer;
+      display: none; align-items: center; justify-content: center;
+      transition: all 0.3s;
+      box-shadow: 0 0 20px rgba(201,168,76,0.2);
+    }
+    #archive-btn:hover { background: var(--gold); color: #000; }
+    #archive-btn .badge {
+      position: absolute; top: -6px; right: -6px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #8b1a1a; font-size: 0.65rem;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--cream); font-family: 'Cinzel', serif;
+    }
+
+    /* ─── VIDEO LETTER ─── */
+    #video-overlay {
+      position: fixed; inset: 0; z-index: 80;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.8s ease;
+    }
+    #video-overlay.open { opacity: 1; pointer-events: all; }
+    .video-frame {
+      border: 2px solid var(--gold);
+      box-shadow: 0 0 80px rgba(201,168,76,0.3);
+      max-width: 640px; width: 90%;
+      position: relative;
+    }
+    .video-frame video, .video-placeholder {
+      width: 100%; display: block;
+    }
+    .video-placeholder {
+      aspect-ratio: 16/9;
+      background: linear-gradient(135deg, #1a0d0a, #0f0806);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1rem;
+    }
+    .video-placeholder .play-icon { font-size: 4rem; color: var(--gold); }
+    .video-placeholder p {
+      font-style: italic; color: rgba(245,234,214,0.6);
+      font-size: 0.9rem;
+    }
+    .video-close {
+      margin-top: 1.5rem;
+      font-family: 'Cinzel', serif; font-size: 0.75rem;
+      letter-spacing: 0.3em; color: var(--gold);
+      border: 1px solid var(--gold); background: transparent;
+      padding: 0.7rem 2rem; cursor: pointer;
+      transition: all 0.3s; text-transform: uppercase;
+    }
+    .video-close:hover { background: var(--gold); color: #000; }
+
+    /* ─── MISSED LETTER TOAST ─── */
+    #toast {
+      position: fixed; bottom: 2rem; left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      z-index: 90; background: rgba(10,8,6,0.95);
+      border: 1px solid var(--gold); padding: 1rem 2rem;
+      text-align: center; max-width: 380px; width: 90%;
+      font-style: italic; font-size: 0.95rem;
+      color: var(--cream); letter-spacing: 0.05em;
+      transition: transform 0.6s ease, opacity 0.6s ease;
+      opacity: 0;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    /* ─── HUD ─── */
+    #hud {
+      position: fixed; top: 1.5rem; left: 50%;
+      transform: translateX(-50%); z-index: 30;
+      font-family: 'Cinzel', serif; font-size: 0.7rem;
+      letter-spacing: 0.3em; color: rgba(201,168,76,0.5);
+      text-transform: uppercase; pointer-events: none;
+      opacity: 0; transition: opacity 1s ease 2s;
+    }
+    #hud.visible { opacity: 1; }
+
+    /* ─── TIMELINE PANEL ─── */
+    #timeline-panel {
+      position: fixed; left: 0; top: 0; bottom: 0; z-index: 60;
+      width: min(380px, 90vw);
+      background: linear-gradient(to right, #0a0806, rgba(10,8,6,0.97));
+      border-right: 1px solid rgba(201,168,76,0.3);
+      padding: 4rem 2rem 2rem;
+      opacity: 0; pointer-events: none;
+      transform: translateX(-100%);
+      transition: transform 0.6s ease, opacity 0.6s ease;
+      overflow-y: auto;
+    }
+    #timeline-panel.open { transform: translateX(0); opacity: 1; pointer-events: all; }
+
+    .timeline-title {
+      font-family: 'Cinzel', serif; font-size: 0.8rem;
+      letter-spacing: 0.4em; color: var(--gold);
+      text-transform: uppercase; margin-bottom: 3rem;
+    }
+    .milestone {
+      display: flex; gap: 1.2rem; margin-bottom: 2.5rem;
+      cursor: pointer; transition: all 0.3s;
+      padding: 0.8rem; border-left: 2px solid transparent;
+    }
+    .milestone:hover { border-left-color: var(--gold); padding-left: 1.2rem; }
+    .milestone-year {
+      font-family: 'Cinzel', serif; font-size: 0.7rem;
+      letter-spacing: 0.2em; color: var(--gold);
+      min-width: 40px; padding-top: 0.2rem;
+    }
+    .milestone-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--gold); margin-top: 0.3rem;
+      flex-shrink: 0; box-shadow: 0 0 8px rgba(201,168,76,0.5);
+    }
+    .milestone-text { font-style: italic; color: var(--cream); line-height: 1.6; }
+    .timeline-close {
+      position: absolute; top: 1.5rem; right: 1.5rem;
+      background: none; border: none; color: var(--gold);
+      font-size: 1.2rem; cursor: pointer;
+    }
+
+    /* ─── LIGHT SWITCH HINT ─── */
+    #switch-hint {
+      position: fixed; bottom: 2.5rem; left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Cinzel', serif;
+      font-size: clamp(0.75rem, 2vw, 0.95rem);
+      color: var(--gold); letter-spacing: 0.2em;
+      z-index: 20; pointer-events: none;
+      opacity: 0; transition: opacity 2s ease;
+      text-align: center;
+      text-transform: uppercase;
+      display: flex; align-items: center; gap: 0.8rem;
+    }
+    #switch-hint.visible { opacity: 1; animation: hint-pulse 2.5s ease-in-out infinite; }
+    #switch-hint .arrow {
+      font-size: 1.2rem;
+      animation: bounce-left 1.2s ease-in-out infinite;
+    }
+    @keyframes bounce-left {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(-6px); }
+    }
+
+    /* ─── ARCHIVE PANEL ─── */
+    #archive-panel {
+      position: fixed; right: 0; top: 0; bottom: 0; z-index: 75;
+      width: min(360px, 90vw);
+      background: linear-gradient(to left, #0a0806, rgba(10,8,6,0.97));
+      border-left: 1px solid rgba(201,168,76,0.3);
+      padding: 4rem 2rem 2rem;
+      opacity: 0; pointer-events: none;
+      transform: translateX(100%);
+      transition: transform 0.6s ease, opacity 0.6s ease;
+      overflow-y: auto;
+    }
+    #archive-panel.open { transform: translateX(0); opacity: 1; pointer-events: all; }
+    .archive-title {
+      font-family: 'Cinzel', serif; font-size: 0.8rem;
+      letter-spacing: 0.4em; color: var(--gold);
+      text-transform: uppercase; margin-bottom: 2rem;
+    }
+    .archive-item {
+      border: 1px solid rgba(201,168,76,0.25);
+      padding: 1rem; margin-bottom: 1rem;
+      cursor: pointer; transition: all 0.3s;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .archive-item:hover { border-color: var(--gold); background: rgba(201,168,76,0.05); }
+    .archive-item .envelope { font-size: 1.5rem; }
+    .archive-item .item-info { font-style: italic; font-size: 0.9rem; color: var(--cream); }
+    .archive-item .item-date { font-size: 0.75rem; color: rgba(201,168,76,0.6); margin-top: 0.2rem; }
+    .archive-empty { font-style: italic; color: rgba(245,234,214,0.3); font-size: 0.9rem; }
+    .archive-close { position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; color: var(--gold); font-size: 1.2rem; cursor: pointer; }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes flicker {
+      0% { opacity: 0.7; transform: scale(1); }
+      100% { opacity: 1; transform: scale(1.05); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(-2deg); }
+      50% { transform: translateY(-18px) rotate(2deg); }
+    }
+    @keyframes glow-pulse {
+      from { filter: drop-shadow(0 0 10px rgba(201,168,76,0.4)); }
+      to   { filter: drop-shadow(0 0 30px rgba(201,168,76,0.9)); }
+    }
+    @keyframes hint-pulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.7; }
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+<!-- ═══ LANDING PAGE ═══ -->
+<div id="landing">
+  <div class="landing-title">Museum of Us</div>
+  <div class="landing-sub">a collection of moments</div>
+  <button class="enter-btn" onclick="enterMuseum()">Tap to Enter</button>
+  <div class="candle-row">
+    <span class="candle">🕯️</span>
+    <span class="candle">🕯️</span>
+    <span class="candle">🕯️</span>
+  </div>
+</div>
+
+<!-- ═══ 3D CANVAS ═══ -->
+<div id="canvas-container">
+  <canvas id="three-canvas"></canvas>
+</div>
+
+<!-- ═══ HUD ═══ -->
+<div id="hud">Museum of Us — Explore Freely</div>
+
+<!-- ═══ LIGHT SWITCH HINT ═══ -->
+<div id="switch-hint"><span class="arrow">←</span> Find the light switch to begin</div>
+
+<!-- ═══ DARK OVERLAY ═══ -->
+<div id="dark-overlay"></div>
+
+<!-- ═══ MEMORY PANEL ═══ -->
+<div id="memory-panel">
+  <div class="memory-card">
+    <button class="close-btn" onclick="closeMemory()">✕</button>
+    <div class="memory-photo" id="memory-photo">📸</div>
+    <div class="memory-date" id="memory-date">—</div>
+    <div class="memory-caption" id="memory-caption">—</div>
+    <button class="voice-btn" id="voice-btn" onclick="playVoiceNote()">♪ Play Voice Note</button>
+  </div>
+</div>
+
+<!-- ═══ FLOATING LETTER ═══ -->
+<div id="floating-letter" onclick="clickLetter()">
+  <div class="letter-inner">💌</div>
+</div>
+
+<!-- ═══ VIDEO OVERLAY ═══ -->
+<div id="video-overlay">
+  <div class="video-frame">
+    <div class="video-placeholder" id="video-placeholder">
+      <div class="play-icon">▶</div>
+      <p>Place your video message here<br><small style="opacity:0.5">Replace this with a &lt;video&gt; element pointing to your file</small></p>
+    </div>
+    <!-- When you have a video: <video controls src="video/letter1.mp4"></video> -->
+  </div>
+  <button class="video-close" onclick="closeVideo()">✕ Close for Now</button>
+</div>
+
+<!-- ═══ TOAST NOTIFICATION ═══ -->
+<div id="toast"></div>
+
+<!-- ═══ ARCHIVE BUTTON ═══ -->
+<button id="archive-btn" onclick="openArchive()" title="Message Archive">
+  📬
+  <span class="badge" id="archive-badge" style="display:none">0</span>
+</button>
+
+<!-- ═══ TIMELINE PANEL ═══ -->
+<div id="timeline-panel">
+  <button class="timeline-close" onclick="closeTimeline()">✕</button>
+  <div class="timeline-title">Our Timeline</div>
+
+  <div class="milestone" onclick="openMilestone(0)">
+    <div class="milestone-year">2019</div>
+    <div class="milestone-dot"></div>
+    <div class="milestone-text">The very first time — everything began here.</div>
+  </div>
+  <div class="milestone" onclick="openMilestone(1)">
+    <div class="milestone-year">2020</div>
+    <div class="milestone-dot"></div>
+    <div class="milestone-text">Our first adventure together. The beginning of everything.</div>
+  </div>
+  <div class="milestone" onclick="openMilestone(2)">
+    <div class="milestone-year">2022</div>
+    <div class="milestone-dot"></div>
+    <div class="milestone-text">A moment I never want to forget.</div>
+  </div>
+  <div class="milestone" onclick="openMilestone(3)">
+    <div class="milestone-year">2024</div>
+    <div class="milestone-dot"></div>
+    <div class="milestone-text">Still here. Still us. Still everything.</div>
+  </div>
+  <div class="milestone" onclick="openMilestone(4)">
+    <div class="milestone-year">Now</div>
+    <div class="milestone-dot"></div>
+    <div class="milestone-text">This very moment, collected forever.</div>
+  </div>
+</div>
+
+<!-- ═══ ARCHIVE PANEL ═══ -->
+<div id="archive-panel">
+  <button class="archive-close" onclick="closeArchive()">✕</button>
+  <div class="archive-title">📬 Message Archive</div>
+  <div id="archive-list">
+    <div class="archive-empty">No missed messages yet.<br><br>Check back as you explore...</div>
+  </div>
+</div>
+
+<!-- ═══ THREE.JS ═══ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+
+// ═══════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════
+const state = {
+  lightsOn: false,
+  entered: false,
+  letterVisible: false,
+  letterWatched: false,
+  letterPending: false,   // clicked but not watched
+  archiveItems: [],
+  currentMemory: null,
+};
+
+// ─ MEMORIES DATA ─
+// 🛠 REPLACE THESE with your actual photos/captions/dates
+const memories = [
+  {
+    id: 'frame1',
+    date: 'January 2019',
+    caption: '"The night everything started. I still remember exactly what you were wearing."',
+    emoji: '🌙',
+    photo: null,   // set to 'images/photo1.jpg' when you have photos
+    hasVoice: true,
+    audio: null,   // set to 'audio/voice1.mp3'
+  },
+  {
+    id: 'frame2',
+    date: 'Summer 2020',
+    caption: '"The road trip where we got lost and found something better."',
+    emoji: '🌅',
+    photo: null,
+    hasVoice: true,
+    audio: null,
+  },
+  {
+    id: 'frame3',
+    date: 'March 2021',
+    caption: '"You made this ordinary day the most extraordinary one."',
+    emoji: '🌸',
+    photo: null,
+    hasVoice: false,
+    audio: null,
+  },
+  {
+    id: 'frame4',
+    date: 'December 2022',
+    caption: '"The lights, the snow, you. I wanted time to stop."',
+    emoji: '❄️',
+    photo: null,
+    hasVoice: true,
+    audio: null,
+  },
+  {
+    id: 'frame5',
+    date: 'April 2024',
+    caption: '"Still choosing you. Every single day."',
+    emoji: '💛',
+    photo: null,
+    hasVoice: false,
+    audio: null,
+  },
+  {
+    id: 'timeline',
+    date: 'Our Journey',
+    caption: '"Every chapter written together."',
+    emoji: '📖',
+    isTimeline: true,
+  },
+];
+
+const milestones = [
+  { year: '2019', text: 'First Met', caption: '"And there you were."', emoji: '✨' },
+  { year: '2020', text: 'First Trip', caption: '"Adventure suits us."', emoji: '✈️' },
+  { year: '2022', text: 'Favorite Memory', caption: '"I replay this day constantly."', emoji: '🌟' },
+  { year: '2024', text: 'Still Here', caption: '"And we always will be."', emoji: '💛' },
+  { year: 'Now',  text: 'This Moment', caption: '"Right here. Right now. You."', emoji: '💌' },
+];
+
+// ═══════════════════════════════════════════════════════
+//  THREE.JS SETUP
+// ═══════════════════════════════════════════════════════
+const canvas = document.getElementById('three-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputEncoding = THREE.sRGBEncoding;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x030201);
+scene.fog = new THREE.Fog(0x030201, 8, 25);
+
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.set(0, 1.7, 6);
+camera.lookAt(0, 1.5, 0);
+
+// ─ TEXTURES ─
+const texLoader = new THREE.TextureLoader();
+
+function makeRepeatTexture(color1, color2, size=64) {
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = color1;
+  ctx.fillRect(0, 0, size, size);
+  ctx.fillStyle = color2;
+  for (let i = 0; i < size; i += 8) {
+    for (let j = 0; j < size; j += 8) {
+      if ((i + j) % 16 === 0) ctx.fillRect(i, j, 8, 8);
+    }
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(6, 6);
+  return t;
+}
+
+function makeWoodTexture() {
+  const c = document.createElement('canvas');
+  c.width = 512; c.height = 512;
+  const ctx = c.getContext('2d');
+  const grad = ctx.createLinearGradient(0, 0, 512, 0);
+  grad.addColorStop(0, '#2a1a0a');
+  grad.addColorStop(0.3, '#1e1208');
+  grad.addColorStop(0.6, '#2d1c0c');
+  grad.addColorStop(1, '#1a0f06');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 512, 512);
+  ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+  ctx.lineWidth = 2;
+  for (let i = 0; i < 512; i += 12) {
+    ctx.beginPath();
+    ctx.moveTo(0, i + Math.sin(i * 0.1) * 3);
+    ctx.lineTo(512, i + Math.sin(i * 0.1 + 5) * 3);
+    ctx.stroke();
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(4, 4);
+  return t;
+}
+
+function makeWallTexture() {
+  const c = document.createElement('canvas');
+  c.width = 256; c.height = 256;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#0d0b08';
+  ctx.fillRect(0, 0, 256, 256);
+  for (let i = 0; i < 200; i++) {
+    const x = Math.random() * 256, y = Math.random() * 256;
+    const r = Math.random() * 2;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(30,20,10,${Math.random() * 0.5})`;
+    ctx.fill();
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(3, 3);
+  return t;
+}
+
+// ─ MATERIALS ─
+const wallMat = new THREE.MeshStandardMaterial({ map: makeWallTexture(), roughness: 0.9, metalness: 0.0, color: 0x1a1510 });
+const floorMat = new THREE.MeshStandardMaterial({ map: makeWoodTexture(), roughness: 0.7, metalness: 0.05 });
+const ceilingMat = new THREE.MeshStandardMaterial({ color: 0x0a0806, roughness: 1 });
+const goldMat = new THREE.MeshStandardMaterial({ color: 0xc9a84c, metalness: 0.9, roughness: 0.2 });
+const frameBgMat = () => new THREE.MeshStandardMaterial({ color: new THREE.Color(Math.random()*0.1+0.05, Math.random()*0.05, Math.random()*0.05), roughness: 0.8 });
+
+// ═══════════════════════════════════════════════════════
+//  BUILD MUSEUM
+// ═══════════════════════════════════════════════════════
+const W = 12, H = 4.5, D = 10;
+
+// Floor
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(W, D), floorMat);
+floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true;
+scene.add(floor);
+
+// Ceiling
+const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(W, D), ceilingMat);
+ceiling.rotation.x = Math.PI / 2; ceiling.position.y = H;
+scene.add(ceiling);
+
+// Walls
+const backWall = new THREE.Mesh(new THREE.PlaneGeometry(W, H), wallMat);
+backWall.position.set(0, H/2, -D/2); scene.add(backWall);
+
+const frontWall = new THREE.Mesh(new THREE.PlaneGeometry(W, H), wallMat);
+frontWall.rotation.y = Math.PI; frontWall.position.set(0, H/2, D/2); scene.add(frontWall);
+
+const leftWall = new THREE.Mesh(new THREE.PlaneGeometry(D, H), wallMat);
+leftWall.rotation.y = Math.PI/2; leftWall.position.set(-W/2, H/2, 0); scene.add(leftWall);
+
+const rightWall = new THREE.Mesh(new THREE.PlaneGeometry(D, H), wallMat);
+rightWall.rotation.y = -Math.PI/2; rightWall.position.set(W/2, H/2, 0); scene.add(rightWall);
+
+// Crown molding
+function addMolding(x, y, z, rx, ry, w) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, 0.12, 0.08), goldMat);
+  m.position.set(x, y, z); m.rotation.y = ry; scene.add(m);
+}
+addMolding(0, H-0.06, -D/2+0.04, 0, 0, W);
+addMolding(0, H-0.06,  D/2-0.04, 0, Math.PI, W);
+addMolding(-W/2+0.04, H-0.06, 0, 0, Math.PI/2, D);
+addMolding( W/2-0.04, H-0.06, 0, 0,-Math.PI/2, D);
+// Baseboard
+addMolding(0, 0.06, -D/2+0.04, 0, 0, W);
+addMolding(0, 0.06,  D/2-0.04, 0, Math.PI, W);
+addMolding(-W/2+0.04, 0.06, 0, 0, Math.PI/2, D);
+addMolding( W/2-0.04, 0.06, 0, 0,-Math.PI/2, D);
+
+// ─ DOOR ─
+const doorGroup = new THREE.Group();
+const doorBody = new THREE.Mesh(new THREE.BoxGeometry(1.4, 2.8, 0.08), new THREE.MeshStandardMaterial({ color: 0x1a0f08, roughness: 0.8, metalness: 0.1 }));
+doorBody.castShadow = true;
+doorGroup.add(doorBody);
+// Door frame
+const dfMat = new THREE.MeshStandardMaterial({ color: 0xc9a84c, metalness: 0.8, roughness: 0.2 });
+[[-0.75,0,0.05],[0.75,0,0.05],[0,1.45,0.05]].forEach(([x,y,z], i) => {
+  const df = new THREE.Mesh(new THREE.BoxGeometry(i<2?0.1:1.6, i<2?2.9:0.1, 0.05), dfMat);
+  df.position.set(x, y, z); doorGroup.add(df);
+});
+// Handle
+const handle = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), goldMat);
+handle.position.set(0.55, 0, 0.1); doorGroup.add(handle);
+
+doorGroup.position.set(0, 1.4, D/2-0.04);
+scene.add(doorGroup);
+
+// ─ PICTURE FRAMES ─
+const framePositions = [
+  { pos: [-4, 2.2, -D/2+0.1], ry: 0, memIndex: 0 },
+  { pos: [-1.5, 2.2, -D/2+0.1], ry: 0, memIndex: 1 },
+  { pos: [ 1.5, 2.2, -D/2+0.1], ry: 0, memIndex: 2 },
+  { pos: [ 4,   2.2, -D/2+0.1], ry: 0, memIndex: 3 },
+  { pos: [-W/2+0.1, 2.2, -1], ry: Math.PI/2, memIndex: 4 },
+  { pos: [ W/2-0.1, 2.2,  0], ry: -Math.PI/2, memIndex: 0 },
+];
+
+const clickableFrames = [];
+
+framePositions.forEach(({ pos, ry, memIndex }) => {
+  const grp = new THREE.Group();
+  grp.position.set(...pos);
+  grp.rotation.y = ry;
+  grp.userData.memIndex = memIndex;
+  grp.userData.isFrame = true;
+
+  // Frame border
+  const border = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.3, 0.06), goldMat);
+  grp.add(border);
+
+  // Canvas inside
+  const inner = new THREE.Mesh(new THREE.BoxGeometry(1.35, 1.05, 0.04), frameBgMat());
+  inner.position.z = 0.02; grp.add(inner);
+
+  // Emoji canvas
+  const emojiCanvas = document.createElement('canvas');
+  emojiCanvas.width = emojiCanvas.height = 128;
+  const ectx = emojiCanvas.getContext('2d');
+  ectx.font = '72px serif';
+  ectx.textAlign = 'center'; ectx.textBaseline = 'middle';
+  ectx.fillText(memories[memIndex]?.emoji || '🖼', 64, 64);
+  const emojiTex = new THREE.CanvasTexture(emojiCanvas);
+  const emojiMesh = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 0.8), new THREE.MeshBasicMaterial({ map: emojiTex, transparent: true }));
+  emojiMesh.position.z = 0.04; grp.add(emojiMesh);
+
+  scene.add(grp);
+  clickableFrames.push(grp);
+});
+
+// ─ TIMELINE PLAQUE on left wall ─
+const timelineGrp = new THREE.Group();
+timelineGrp.position.set(-W/2+0.1, 2.2, 2);
+timelineGrp.rotation.y = Math.PI/2;
+timelineGrp.userData.isTimeline = true;
+
+const tPlaque = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.8, 0.06), goldMat);
+timelineGrp.add(tPlaque);
+const tInner = new THREE.Mesh(new THREE.BoxGeometry(2.0, 1.6, 0.04), new THREE.MeshStandardMaterial({ color: 0x0a0806 }));
+tInner.position.z = 0.02; timelineGrp.add(tInner);
+const tLabel = document.createElement('canvas');
+tLabel.width = 256; tLabel.height = 200;
+const tlctx = tLabel.getContext('2d');
+tlctx.fillStyle = '#c9a84c'; tlctx.font = 'italic 28px serif';
+tlctx.textAlign = 'center';
+tlctx.fillText('Our Timeline', 128, 50);
+tlctx.font = '18px serif'; tlctx.fillStyle = '#f5ead6';
+['2019', '2020', '2022', '2024', 'Now'].forEach((y, i) => tlctx.fillText(`${y} ─────────`, 128, 90 + i * 24));
+const tTex = new THREE.CanvasTexture(tLabel);
+const tMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 1.4), new THREE.MeshBasicMaterial({ map: tTex, transparent: true }));
+tMesh.position.z = 0.05; timelineGrp.add(tMesh);
+scene.add(timelineGrp);
+
+// ─ LIGHT SWITCH ─
+const switchGrp = new THREE.Group();
+switchGrp.position.set(-W/2+0.08, 1.2, 3.5);
+switchGrp.rotation.y = Math.PI/2;
+switchGrp.userData.isSwitch = true;
+
+const switchBox = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.3, 0.04), new THREE.MeshStandardMaterial({ color: 0x2a2015, roughness: 0.7 }));
+switchGrp.add(switchBox);
+const switchPlate = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.1, 0.05), new THREE.MeshStandardMaterial({ color: 0xd4af60, metalness: 0.9, roughness: 0.1 }));
+switchPlate.position.y = 0.04; switchGrp.add(switchPlate);
+const switchLabel = document.createElement('canvas');
+switchLabel.width = 64; switchLabel.height = 32;
+const slctx = switchLabel.getContext('2d');
+slctx.fillStyle = '#c9a84c'; slctx.font = '10px sans-serif';
+slctx.textAlign = 'center'; slctx.fillText('LIGHTS', 32, 20);
+const slTex = new THREE.CanvasTexture(switchLabel);
+const slMesh = new THREE.Mesh(new THREE.PlaneGeometry(0.18, 0.08), new THREE.MeshBasicMaterial({ map: slTex, transparent: true }));
+slMesh.position.set(0, -0.1, 0.03); switchGrp.add(slMesh);
+scene.add(switchGrp);
+
+// ─ SWITCH GLOW AURA (pulsing ring) ─
+const auraGeo = new THREE.RingGeometry(0.22, 0.32, 32);
+const auraMat = new THREE.MeshBasicMaterial({ color: 0xf0c050, transparent: true, opacity: 0.7, side: THREE.DoubleSide });
+const auraRing = new THREE.Mesh(auraGeo, auraMat);
+auraRing.position.set(-W/2+0.12, 1.2, 3.5);
+auraRing.rotation.y = Math.PI/2;
+scene.add(auraRing);
+
+// Small warm spotlight on the switch
+const switchSpot = new THREE.PointLight(0xf5c842, 1.8, 2.5);
+switchSpot.position.set(-W/2+1.2, 1.8, 3.5);
+scene.add(switchSpot);
+
+// ─ DUST PARTICLES ─
+const particleCount = 80;
+const pGeo = new THREE.BufferGeometry();
+const pPos = new Float32Array(particleCount * 3);
+for (let i = 0; i < particleCount * 3; i += 3) {
+  pPos[i]   = (Math.random() - 0.5) * W;
+  pPos[i+1] = Math.random() * H;
+  pPos[i+2] = (Math.random() - 0.5) * D;
+}
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+const particleMat = new THREE.PointsMaterial({ color: 0xc9a84c, size: 0.03, transparent: true, opacity: 0 });
+const particles = new THREE.Points(pGeo, particleMat);
+scene.add(particles);
+
+// ─ LIGHTING ─
+const ambient = new THREE.AmbientLight(0x050403, 0.3);
+scene.add(ambient);
+
+// Entry dim light (always on)
+const entryLight = new THREE.PointLight(0x4a3820, 0.5, 8);
+entryLight.position.set(0, 2, 4); scene.add(entryLight);
+
+// Main lights (off until switch)
+const mainLights = [];
+[[-3,H-0.5,-2],[3,H-0.5,-2],[0,H-0.5,0],[-3,H-0.5,2],[3,H-0.5,2]].forEach(([x,y,z]) => {
+  const spot = new THREE.SpotLight(0xf5d98a, 0, 6, Math.PI/4, 0.5, 1.5);
+  spot.position.set(x, y, z);
+  spot.target.position.set(x, 0, z);
+  spot.castShadow = true;
+  scene.add(spot); scene.add(spot.target);
+  mainLights.push(spot);
+});
+
+// Frame spotlights
+const frameSpots = [];
+framePositions.forEach(({ pos }) => {
+  const s = new THREE.SpotLight(0xf0c870, 0, 4, Math.PI/6, 0.4, 2);
+  s.position.set(pos[0], pos[1]+1.5, pos[2]+1.5);
+  s.target.position.set(...pos);
+  scene.add(s); scene.add(s.target);
+  frameSpots.push(s);
+});
+
+// ═══════════════════════════════════════════════════════
+//  CAMERA CONTROL
+// ═══════════════════════════════════════════════════════
+let targetCamPos = new THREE.Vector3(0, 1.7, 6);
+let targetLookAt = new THREE.Vector3(0, 1.5, 0);
+let currentLookAt = new THREE.Vector3(0, 1.5, 0);
+let isDragging = false, lastMouse = { x: 0, y: 0 };
+let camYaw = 0, camPitch = 0;
+const ROOM_BOUNDS = { x: W/2 - 0.5, z: D/2 - 0.5 };
+
+canvas.addEventListener('mousedown', e => { isDragging = true; lastMouse = { x: e.clientX, y: e.clientY }; });
+canvas.addEventListener('mouseup', () => isDragging = false);
+canvas.addEventListener('mousemove', e => {
+  if (!isDragging || !state.lightsOn) return;
+  const dx = e.clientX - lastMouse.x;
+  const dy = e.clientY - lastMouse.y;
+  camYaw   -= dx * 0.003;
+  camPitch -= dy * 0.002;
+  camPitch  = Math.max(-0.4, Math.min(0.4, camPitch));
+  lastMouse = { x: e.clientX, y: e.clientY };
+});
+canvas.addEventListener('wheel', e => {
+  if (!state.lightsOn) return;
+  const dir = new THREE.Vector3();
+  camera.getWorldDirection(dir);
+  const newPos = camera.position.clone().addScaledVector(dir, -e.deltaY * 0.005);
+  newPos.x = Math.max(-ROOM_BOUNDS.x, Math.min(ROOM_BOUNDS.x, newPos.x));
+  newPos.y = Math.max(1.2, Math.min(2.5, newPos.y));
+  newPos.z = Math.max(-ROOM_BOUNDS.z, Math.min(ROOM_BOUNDS.z, newPos.z));
+  targetCamPos.copy(newPos);
+});
+
+// Touch support
+let lastTouch = null;
+canvas.addEventListener('touchstart', e => { lastTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY }; });
+canvas.addEventListener('touchmove', e => {
+  if (!lastTouch || !state.lightsOn) return;
+  const dx = e.touches[0].clientX - lastTouch.x;
+  const dy = e.touches[0].clientY - lastTouch.y;
+  camYaw -= dx * 0.003; camPitch -= dy * 0.002;
+  camPitch = Math.max(-0.4, Math.min(0.4, camPitch));
+  lastTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  e.preventDefault();
+}, { passive: false });
+
+// ═══════════════════════════════════════════════════════
+//  RAYCASTING / CLICKS
+// ═══════════════════════════════════════════════════════
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+function getClickTargets() {
+  return [...clickableFrames, timelineGrp, switchGrp];
+}
+
+canvas.addEventListener('click', e => {
+  if (!state.entered) return;
+  mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+
+  const allMeshes = [];
+  getClickTargets().forEach(grp => {
+    grp.traverse(child => { if (child.isMesh) allMeshes.push(child); });
+  });
+
+  const hits = raycaster.intersectObjects(allMeshes);
+  if (!hits.length) return;
+
+  let target = hits[0].object;
+  while (target.parent && !target.userData.isFrame && !target.userData.isTimeline && !target.userData.isSwitch) {
+    target = target.parent;
+  }
+
+  if (target.userData.isSwitch) { turnOnLights(); return; }
+  if (target.userData.isTimeline) { openTimeline(); return; }
+  if (target.userData.isFrame) {
+    const mem = memories[target.userData.memIndex];
+    if (mem) openMemory(mem);
+    return;
+  }
+  // Walk up tree
+  hits.forEach(h => {
+    const grp = h.object.parent?.parent || h.object.parent || h.object;
+    if (grp?.userData?.isSwitch) turnOnLights();
+    else if (grp?.userData?.isTimeline) openTimeline();
+    else if (grp?.userData?.isFrame) openMemory(memories[grp.userData.memIndex]);
+  });
+});
+
+// ═══════════════════════════════════════════════════════
+//  LIGHTING SYSTEM
+// ═══════════════════════════════════════════════════════
+let lightProgress = 0;
+function turnOnLights() {
+  if (state.lightsOn) return;
+  state.lightsOn = true;
+  document.getElementById('switch-hint').classList.remove('visible');
+  document.getElementById('hud').classList.add('visible');
+  // Hide the aura once lights are on
+  auraRing.visible = false;
+  switchSpot.intensity = 0;
+  // Reset look-at to museum center
+  targetLookAt.set(0, 1.5, 0);
+  startJazz();
+  scheduleNextLetter();
+}
+
+function updateLights(dt) {
+  if (!state.lightsOn) return;
+  lightProgress = Math.min(1, lightProgress + dt * 0.6);
+  const e = lightProgress < 0.5 ? 4 * lightProgress ** 3 : 1 - (-2 * lightProgress + 2) ** 3 / 2;
+  mainLights.forEach(l => l.intensity = e * 1.2);
+  frameSpots.forEach(l => l.intensity = e * 2.0);
+  particleMat.opacity = e * 0.4;
+  ambient.intensity = e * 0.6;
+}
+
+// ═══════════════════════════════════════════════════════
+//  MEMORY PANEL
+// ═══════════════════════════════════════════════════════
+function openMemory(mem) {
+  state.currentMemory = mem;
+  const panel = document.getElementById('memory-panel');
+  const photo = document.getElementById('memory-photo');
+  document.getElementById('memory-date').textContent = mem.date;
+  document.getElementById('memory-caption').textContent = mem.caption;
+  const voiceBtn = document.getElementById('voice-btn');
+  voiceBtn.style.display = mem.hasVoice ? 'inline-block' : 'none';
+
+  photo.innerHTML = '';
+  if (mem.photo) {
+    const img = document.createElement('img');
+    img.src = mem.photo; photo.appendChild(img);
+  } else {
+    photo.textContent = mem.emoji || '📸';
+    photo.style.fontSize = '3.5rem';
+  }
+
+  document.getElementById('dark-overlay').classList.add('active');
+  panel.classList.add('open');
+}
+
+function closeMemory() {
+  document.getElementById('memory-panel').classList.remove('open');
+  document.getElementById('dark-overlay').classList.remove('active');
+}
+
+function playVoiceNote() {
+  const mem = state.currentMemory;
+  if (!mem?.audio) {
+    showToast('Voice note: place your audio file at audio/voice1.mp3 and set it in the memories data.');
+    return;
+  }
+  const audio = new Audio(mem.audio);
+  audio.play();
+}
+
+// ═══════════════════════════════════════════════════════
+//  TIMELINE
+// ═══════════════════════════════════════════════════════
+function openTimeline() {
+  document.getElementById('dark-overlay').classList.add('active');
+  document.getElementById('timeline-panel').classList.add('open');
+}
+function closeTimeline() {
+  document.getElementById('timeline-panel').classList.remove('open');
+  document.getElementById('dark-overlay').classList.remove('active');
+}
+function openMilestone(i) {
+  const ms = milestones[i];
+  if (!ms) return;
+  closeTimeline();
+  openMemory({ date: ms.year + ' — ' + ms.text, caption: ms.caption, emoji: ms.emoji });
+}
+
+// ═══════════════════════════════════════════════════════
+//  FLOATING LETTER SYSTEM
+// ═══════════════════════════════════════════════════════
+let letterTimeout = null;
+
+function scheduleNextLetter() {
+  const delay = 20000 + Math.random() * 40000; // 20–60s
+  letterTimeout = setTimeout(showLetter, delay);
+}
+
+function showLetter() {
+  if (state.letterVisible) return;
+  state.letterVisible = true;
+  const el = document.getElementById('floating-letter');
+  const x = 20 + Math.random() * 60;
+  const y = 20 + Math.random() * 40;
+  el.style.left = x + 'vw';
+  el.style.top  = y + 'vh';
+  el.classList.add('visible');
+
+  // Auto-disappear after 12s
+  setTimeout(() => {
+    if (state.letterVisible && !state.letterPending) {
+      missedLetter();
+    }
+  }, 12000);
+}
+
+function clickLetter() {
+  if (!state.letterVisible) return;
+  state.letterVisible = false;
+  state.letterPending = true;
+  document.getElementById('floating-letter').classList.remove('visible');
+  openVideoLetter();
+}
+
+function missedLetter() {
+  state.letterVisible = false;
+  document.getElementById('floating-letter').classList.remove('visible');
+  addToArchive();
+  showToast('You missed a message 💌\nDon\'t worry — it\'s been saved to your archive. Look for 📬');
+  scheduleNextLetter();
+}
+
+// ═══════════════════════════════════════════════════════
+//  VIDEO LETTER
+// ═══════════════════════════════════════════════════════
+function openVideoLetter() {
+  document.getElementById('dark-overlay').classList.add('active');
+  document.getElementById('video-overlay').classList.add('open');
+  pauseJazz();
+}
+
+function closeVideo() {
+  const overlay = document.getElementById('video-overlay');
+  overlay.classList.remove('open');
+
+  if (state.letterPending) {
+    // Show outlined envelope to return later
+    showPendingEnvelope();
+    state.letterPending = false;
+  }
+
+  document.getElementById('dark-overlay').classList.remove('active');
+  resumeJazz();
+
+  if (!state.letterWatched) {
+    scheduleNextLetter();
+  }
+  state.letterWatched = true;
+}
+
+function showPendingEnvelope() {
+  const archBtn = document.getElementById('archive-btn');
+  archBtn.textContent = '✉️';
+  archBtn.style.display = 'flex';
+  addToArchive('pending');
+}
+
+// ═══════════════════════════════════════════════════════
+//  ARCHIVE
+// ═══════════════════════════════════════════════════════
+function addToArchive(type = 'missed') {
+  const now = new Date();
+  const label = type === 'pending' ? 'Unopened Message' : 'Missed Message';
+  state.archiveItems.push({ type, label, time: now.toLocaleTimeString() });
+  updateArchiveBadge();
+  const archBtn = document.getElementById('archive-btn');
+  archBtn.style.display = 'flex';
+}
+
+function updateArchiveBadge() {
+  const badge = document.getElementById('archive-badge');
+  const n = state.archiveItems.length;
+  if (n > 0) {
+    badge.textContent = n; badge.style.display = 'flex';
+  }
+}
+
+function openArchive() {
+  const panel = document.getElementById('archive-panel');
+  const list  = document.getElementById('archive-list');
+  if (!state.archiveItems.length) {
+    list.innerHTML = '<div class="archive-empty">No messages yet.<br><br>Keep exploring...</div>';
+  } else {
+    list.innerHTML = state.archiveItems.map((item, i) =>
+      `<div class="archive-item" onclick="replayFromArchive(${i})">
+        <span class="envelope">${item.type === 'pending' ? '✉️' : '💌'}</span>
+        <div class="item-info">
+          ${item.label}
+          <div class="item-date">${item.time}</div>
+        </div>
+      </div>`
+    ).join('');
+  }
+  document.getElementById('dark-overlay').classList.add('active');
+  panel.classList.add('open');
+}
+
+function replayFromArchive(i) {
+  closeArchive();
+  openVideoLetter();
+}
+
+function closeArchive() {
+  document.getElementById('archive-panel').classList.remove('open');
+  document.getElementById('dark-overlay').classList.remove('active');
+}
+
+// ═══════════════════════════════════════════════════════
+//  AUDIO
+// ═══════════════════════════════════════════════════════
+let jazzAudio = null;
+function startJazz() {
+  // 🛠 Replace src with your audio file: audio/jazz.mp3
+  // For now, uses a placeholder tone
+  try {
+    if (!jazzAudio) {
+      jazzAudio = new Audio('audio/jazz.mp3');
+      jazzAudio.loop = true;
+      jazzAudio.volume = 0;
+    }
+    jazzAudio.play().catch(() => {});
+    fadeAudio(jazzAudio, 0, 0.5, 3000);
+  } catch(e) {}
+}
+function pauseJazz() { if (jazzAudio) fadeAudio(jazzAudio, jazzAudio.volume, 0, 800); }
+function resumeJazz() { if (jazzAudio) fadeAudio(jazzAudio, jazzAudio.volume, 0.5, 800); }
+function fadeAudio(aud, from, to, dur) {
+  const steps = 30, step = (to - from) / steps;
+  let i = 0;
+  const t = setInterval(() => {
+    aud.volume = Math.max(0, Math.min(1, from + step * i));
+    if (++i >= steps) clearInterval(t);
+  }, dur / steps);
+}
+
+// ═══════════════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 5000);
+}
+
+// ═══════════════════════════════════════════════════════
+//  ENTER MUSEUM (landing → 3D)
+// ═══════════════════════════════════════════════════════
+function enterMuseum() {
+  const landing = document.getElementById('landing');
+  landing.classList.add('fade-out');
+  setTimeout(() => {
+    landing.style.display = 'none';
+    state.entered = true;
+    animateDoorOpen();
+  }, 1800);
+}
+
+let doorOpen = false;
+function animateDoorOpen() {
+  doorOpen = true;
+  // Door swings open, camera moves in facing the switch
+  setTimeout(() => {
+    targetCamPos.set(0, 1.7, 3.5);
+    // Look slightly left toward where the switch is
+    targetLookAt.set(-W/2 + 1.5, 1.2, 3.5);
+    setTimeout(() => {
+      document.getElementById('switch-hint').classList.add('visible');
+    }, 2000);
+  }, 1000);
+}
+
+// ═══════════════════════════════════════════════════════
+//  HOVER CURSOR
+// ═══════════════════════════════════════════════════════
+canvas.addEventListener('mousemove', e => {
+  if (!state.entered) return;
+  mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const allMeshes = [];
+  getClickTargets().forEach(grp => grp.traverse(c => { if (c.isMesh) allMeshes.push(c); }));
+  const hits = raycaster.intersectObjects(allMeshes);
+  canvas.style.cursor = hits.length ? 'pointer' : (state.lightsOn ? 'grab' : 'default');
+});
+
+// ═══════════════════════════════════════════════════════
+//  ANIMATION LOOP
+// ═══════════════════════════════════════════════════════
+let lastTime = 0;
+let doorAngle = 0;
+
+function animate(time) {
+  requestAnimationFrame(animate);
+  const dt = Math.min((time - lastTime) / 1000, 0.05);
+  lastTime = time;
+
+  // Door animation
+  if (doorOpen && doorAngle < Math.PI * 0.55) {
+    doorAngle += dt * 1.2;
+    doorGroup.rotation.y = -doorAngle;
+    doorGroup.position.x = Math.sin(doorAngle) * 0.7;
+  }
+
+  // Camera smooth follow
+  camera.position.lerp(targetCamPos, 0.05);
+
+  // Camera look direction
+  if (state.lightsOn) {
+    const lookX = Math.sin(camYaw) * Math.cos(camPitch);
+    const lookY = Math.sin(camPitch);
+    const lookZ = -Math.cos(camYaw) * Math.cos(camPitch);
+    currentLookAt.lerp(
+      camera.position.clone().add(new THREE.Vector3(lookX, lookY, lookZ)),
+      0.08
+    );
+  } else {
+    currentLookAt.lerp(targetLookAt, 0.05);
+  }
+  camera.lookAt(currentLookAt);
+
+  // Dust particles drift
+  if (state.lightsOn) {
+    const pos = pGeo.attributes.position.array;
+    for (let i = 1; i < pos.length; i += 3) {
+      pos[i] += dt * 0.02;
+      if (pos[i] > H) pos[i] = 0;
+    }
+    pGeo.attributes.position.needsUpdate = true;
+  }
+
+  // Frame gentle hover animation
+  clickableFrames.forEach((f, i) => {
+    f.position.y += Math.sin(time * 0.001 + i) * 0.0002;
+  });
+
+  // Aura pulse
+  if (!state.lightsOn && auraRing.visible) {
+    const pulse = 0.5 + 0.5 * Math.sin(time * 0.003);
+    auraRing.material.opacity = 0.4 + pulse * 0.5;
+    const s = 0.9 + pulse * 0.2;
+    auraRing.scale.set(s, s, s);
+    switchSpot.intensity = 1.2 + pulse * 1.0;
+  }
+
+  updateLights(dt);
+  renderer.render(scene, camera);
+}
+
+animate(0);
+
+// ═══════════════════════════════════════════════════════
+//  RESIZE
+// ═══════════════════════════════════════════════════════
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+</script>
+</body>
+</html>
