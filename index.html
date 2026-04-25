@@ -25,7 +25,11 @@
       overflow: hidden;
       width: 100vw;
       height: 100vh;
+      height: 100dvh;
       cursor: default;
+      touch-action: none;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior: none;
     }
 
     /* ─── LANDING PAGE ─── */
@@ -376,10 +380,56 @@
       50% { opacity: 0.7; }
     }
 
-    /* Scrollbar */
+    #timeline-panel, #archive-panel, .memory-card {
+      touch-action: pan-y;
+      overscroll-behavior: contain;
+    }
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 2px; }
+
+    /* ─── MOBILE WALK BUTTONS ─── */
+    #mobile-controls {
+      display: none;
+      position: fixed; bottom: 2rem; left: 50%;
+      transform: translateX(-50%);
+      z-index: 30; gap: 0.6rem;
+      flex-direction: row; align-items: center;
+    }
+    #mobile-controls.visible { display: flex; }
+    .walk-btn {
+      font-family: 'Cinzel', serif;
+      background: rgba(10,8,6,0.85);
+      border: 1px solid rgba(201,168,76,0.5);
+      color: var(--gold); font-size: 1.1rem;
+      width: 52px; height: 52px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 4px; cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      user-select: none;
+    }
+    .walk-btn:active { background: rgba(201,168,76,0.2); }
+
+    /* ─── MOBILE MEDIA QUERIES ─── */
+    @media (max-width: 600px) {
+      .memory-card {
+        padding: 1.4rem 1.2rem;
+        max-height: 90vh;
+        overflow-y: auto;
+        width: 95%;
+      }
+      .memory-photo { margin-bottom: 1rem; }
+      .memory-caption { font-size: 1rem; margin-bottom: 0.9rem; }
+      #timeline-panel { padding: 3.5rem 1.2rem 1.2rem; }
+      .milestone { margin-bottom: 1.8rem; }
+      #archive-panel { padding: 3.5rem 1.2rem 1.2rem; }
+      .video-frame { width: 96%; }
+      .video-close { padding: 0.6rem 1.4rem; font-size: 0.7rem; }
+      #switch-hint { font-size: 0.7rem; letter-spacing: 0.1em; bottom: 1.5rem; }
+      #archive-btn { bottom: 1.2rem; right: 1.2rem; }
+      #toast { bottom: 1rem; font-size: 0.85rem; padding: 0.8rem 1.2rem; }
+    }
   </style>
 </head>
 <body>
@@ -405,7 +455,7 @@
 <div id="hud">Museum of Us — Explore Freely</div>
 
 <!-- ═══ LIGHT SWITCH HINT ═══ -->
-<div id="switch-hint"><span class="arrow">←</span> Find the light switch to begin</div>
+<div id="switch-hint"><span class="arrow">←</span> <span id="hint-text">Find the light switch to begin</span></div>
 
 <!-- ═══ DARK OVERLAY ═══ -->
 <div id="dark-overlay"></div>
@@ -440,6 +490,14 @@
 
 <!-- ═══ TOAST NOTIFICATION ═══ -->
 <div id="toast"></div>
+
+<!-- u2550u2550u2550 MOBILE WALK CONTROLS u2550u2550u2550 -->
+<div id="mobile-controls">
+  <button class="walk-btn" ontouchstart="startWalk('left')" ontouchend="stopWalk()">&#9664;</button>
+  <button class="walk-btn" ontouchstart="startWalk('fwd')"  ontouchend="stopWalk()">&#9650;</button>
+  <button class="walk-btn" ontouchstart="startWalk('back')" ontouchend="stopWalk()">&#9660;</button>
+  <button class="walk-btn" ontouchstart="startWalk('right')" ontouchend="stopWalk()">&#9654;</button>
+</div>
 
 <!-- ═══ ARCHIVE BUTTON ═══ -->
 <button id="archive-btn" onclick="openArchive()" title="Message Archive">
@@ -506,50 +564,85 @@ const state = {
 };
 
 // ─ MEMORIES DATA ─
-// 🛠 REPLACE THESE with your actual photos/captions/dates
 const memories = [
   {
     id: 'frame1',
-    date: 'April 2025',
+    date: 'The First One',
     caption: '"The night I knew I wanted to collect every moment with you."',
     emoji: '🌙',
-    photo: images/first_actual.JPG,
+    photo: 'images/first_actual.JPG',
     hasVoice: true,
-    audio: audio/adura.mp3,
+    audio: 'audio/adura.mp3',
   },
   {
     id: 'frame2',
-    date: 'Summer 2020',
-    caption: '"The road trip where we got lost and found something better."',
+    date: 'September',
+    caption: '"Every ordinary moment with you becomes extraordinary."',
     emoji: '🌅',
-    photo: null,
-    hasVoice: true,
+    photo: 'images/sept.png',
+    hasVoice: false,
     audio: null,
   },
   {
     id: 'frame3',
-    date: 'March 2021',
-    caption: '"You made this ordinary day the most extraordinary one."',
-    emoji: '🌸',
-    photo: null,
+    date: 'October',
+    caption: '"You make every season feel like the best one."',
+    emoji: '🍂',
+    photo: 'images/oct.png',
     hasVoice: false,
     audio: null,
   },
   {
     id: 'frame4',
-    date: 'December 2022',
-    caption: '"The lights, the snow, you. I wanted time to stop."',
-    emoji: '❄️',
-    photo: null,
-    hasVoice: true,
+    date: 'November',
+    caption: '"Grateful. For you, always."',
+    emoji: '🍁',
+    photo: 'images/nov.png',
+    hasVoice: false,
     audio: null,
   },
   {
     id: 'frame5',
-    date: 'April 2024',
-    caption: '"Still choosing you. Every single day."',
+    date: 'December',
+    caption: '"The lights, the cold, you. I wanted time to stop."',
+    emoji: '❄️',
+    photo: 'images/dec.png',
+    hasVoice: false,
+    audio: null,
+  },
+  {
+    id: 'frame6',
+    date: 'January',
+    caption: '"A new year, but the same feeling — you."',
+    emoji: '✨',
+    photo: 'images/jan.png',
+    hasVoice: false,
+    audio: null,
+  },
+  {
+    id: 'frame7',
+    date: 'February',
+    caption: '"Every day feels like the one made for us."',
     emoji: '💛',
-    photo: null,
+    photo: 'images/feb.png',
+    hasVoice: false,
+    audio: null,
+  },
+  {
+    id: 'frame8',
+    date: 'March',
+    caption: '"Watching us grow. Still my favorite thing to witness."',
+    emoji: '🌸',
+    photo: 'images/mar.png',
+    hasVoice: false,
+    audio: null,
+  },
+  {
+    id: 'frame9',
+    date: 'A Quiet Night',
+    caption: '"I am not sleepy. I just want to stay in this moment forever."',
+    emoji: '🌙',
+    photo: 'images/imnotsleepy.png',
     hasVoice: false,
     audio: null,
   },
@@ -586,7 +679,7 @@ scene.background = new THREE.Color(0x030201);
 scene.fog = new THREE.Fog(0x030201, 8, 25);
 
 const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
-camera.position.set(0, 1.7, 6);
+camera.position.set(0, 1.7, 4.7);
 camera.lookAt(0, 1.5, 0);
 
 // ─ TEXTURES ─
@@ -681,7 +774,7 @@ scene.add(ceiling);
 const backWall = new THREE.Mesh(new THREE.PlaneGeometry(W, H), wallMat);
 backWall.position.set(0, H/2, -D/2); scene.add(backWall);
 
-const frontWall = new THREE.Mesh(new THREE.PlaneGeometry(W, H), wallMat);
+const frontWall = new THREE.Mesh(new THREE.PlaneGeometry(W, H), new THREE.MeshStandardMaterial({ map: makeWallTexture(), roughness: 0.9, metalness: 0.0, color: 0x1a1510, side: THREE.DoubleSide }));
 frontWall.rotation.y = Math.PI; frontWall.position.set(0, H/2, D/2); scene.add(frontWall);
 
 const leftWall = new THREE.Mesh(new THREE.PlaneGeometry(D, H), wallMat);
@@ -725,12 +818,18 @@ scene.add(doorGroup);
 
 // ─ PICTURE FRAMES ─
 const framePositions = [
-  { pos: [-4, 2.2, -D/2+0.1], ry: 0, memIndex: 0 },
-  { pos: [-1.5, 2.2, -D/2+0.1], ry: 0, memIndex: 1 },
-  { pos: [ 1.5, 2.2, -D/2+0.1], ry: 0, memIndex: 2 },
-  { pos: [ 4,   2.2, -D/2+0.1], ry: 0, memIndex: 3 },
-  { pos: [-W/2+0.1, 2.2, -1], ry: Math.PI/2, memIndex: 4 },
-  { pos: [ W/2-0.1, 2.2,  0], ry: -Math.PI/2, memIndex: 0 },
+  // Back wall — 4 frames
+  { pos: [-4,   2.2, -D/2+0.1], ry: 0,             memIndex: 0 },
+  { pos: [-1.5, 2.2, -D/2+0.1], ry: 0,             memIndex: 1 },
+  { pos: [  1.5, 2.2, -D/2+0.1], ry: 0,            memIndex: 2 },
+  { pos: [  4,   2.2, -D/2+0.1], ry: 0,            memIndex: 3 },
+  // Left wall — 3 frames
+  { pos: [-W/2+0.1, 2.2,  2],  ry:  Math.PI/2,    memIndex: 4 },
+  { pos: [-W/2+0.1, 2.2, -1],  ry:  Math.PI/2,    memIndex: 5 },
+  { pos: [-W/2+0.1, 2.2, -3.5], ry: Math.PI/2,    memIndex: 6 },
+  // Right wall — 2 frames
+  { pos: [ W/2-0.1, 2.2,  1],  ry: -Math.PI/2,    memIndex: 7 },
+  { pos: [ W/2-0.1, 2.2, -2],  ry: -Math.PI/2,    memIndex: 8 },
 ];
 
 const clickableFrames = [];
@@ -836,11 +935,11 @@ const particles = new THREE.Points(pGeo, particleMat);
 scene.add(particles);
 
 // ─ LIGHTING ─
-const ambient = new THREE.AmbientLight(0x050403, 0.3);
+const ambient = new THREE.AmbientLight(0x0f0b06, 0.8);
 scene.add(ambient);
 
 // Entry dim light (always on)
-const entryLight = new THREE.PointLight(0x4a3820, 0.5, 8);
+const entryLight = new THREE.PointLight(0x4a3820, 1.2, 12);
 entryLight.position.set(0, 2, 4); scene.add(entryLight);
 
 // Main lights (off until switch)
@@ -867,7 +966,7 @@ framePositions.forEach(({ pos }) => {
 // ═══════════════════════════════════════════════════════
 //  CAMERA CONTROL
 // ═══════════════════════════════════════════════════════
-let targetCamPos = new THREE.Vector3(0, 1.7, 6);
+let targetCamPos = new THREE.Vector3(0, 1.7, 4.7);
 let targetLookAt = new THREE.Vector3(0, 1.5, 0);
 let currentLookAt = new THREE.Vector3(0, 1.5, 0);
 let isDragging = false, lastMouse = { x: 0, y: 0 };
@@ -896,18 +995,68 @@ canvas.addEventListener('wheel', e => {
   targetCamPos.copy(newPos);
 });
 
-// Touch support
+// Touch support — look around + tap to click
 let lastTouch = null;
-canvas.addEventListener('touchstart', e => { lastTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY }; });
+let touchStartPos = null;
+let touchMoved = false;
+
+canvas.addEventListener('touchstart', e => {
+  const t = e.touches[0];
+  lastTouch = { x: t.clientX, y: t.clientY };
+  touchStartPos = { x: t.clientX, y: t.clientY };
+  touchMoved = false;
+}, { passive: true });
+
 canvas.addEventListener('touchmove', e => {
-  if (!lastTouch || !state.lightsOn) return;
-  const dx = e.touches[0].clientX - lastTouch.x;
-  const dy = e.touches[0].clientY - lastTouch.y;
-  camYaw -= dx * 0.003; camPitch -= dy * 0.002;
-  camPitch = Math.max(-0.4, Math.min(0.4, camPitch));
-  lastTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  if (!lastTouch) return;
+  const t = e.touches[0];
+  const dx = t.clientX - lastTouch.x;
+  const dy = t.clientY - lastTouch.y;
+  const totalDist = Math.hypot(t.clientX - touchStartPos.x, t.clientY - touchStartPos.y);
+  if (totalDist > 8) touchMoved = true;
+  if (state.lightsOn) {
+    camYaw   -= dx * 0.005;
+    camPitch -= dy * 0.003;
+    camPitch = Math.max(-0.45, Math.min(0.45, camPitch));
+  }
+  lastTouch = { x: t.clientX, y: t.clientY };
   e.preventDefault();
 }, { passive: false });
+
+canvas.addEventListener('touchend', e => {
+  if (!touchMoved && touchStartPos) {
+    // Treat as a tap — run raycaster at touch position
+    const touch = e.changedTouches[0];
+    handleCanvasTap(touch.clientX, touch.clientY);
+  }
+  lastTouch = null;
+  touchStartPos = null;
+}, { passive: true });
+
+// ─── MOBILE WALK BUTTONS ───
+let walkInterval = null;
+function startWalk(dir) {
+  stopWalk();
+  walkInterval = setInterval(() => {
+    if (!state.lightsOn) return;
+    const fwd = new THREE.Vector3();
+    camera.getWorldDirection(fwd); fwd.y = 0; fwd.normalize();
+    const right = new THREE.Vector3().crossVectors(fwd, new THREE.Vector3(0,1,0)).normalize();
+    let move = new THREE.Vector3();
+    if (dir === 'fwd')   move.addScaledVector(fwd, 0.06);
+    if (dir === 'back')  move.addScaledVector(fwd, -0.06);
+    if (dir === 'left')  move.addScaledVector(right, -0.06);
+    if (dir === 'right') move.addScaledVector(right, 0.06);
+    const np = targetCamPos.clone().add(move);
+    np.x = Math.max(-ROOM_BOUNDS.x, Math.min(ROOM_BOUNDS.x, np.x));
+    np.y = Math.max(1.2, Math.min(2.5, np.y));
+    np.z = Math.max(-ROOM_BOUNDS.z, Math.min(ROOM_BOUNDS.z, np.z));
+    targetCamPos.copy(np);
+  }, 30);
+}
+function stopWalk() {
+  if (walkInterval) { clearInterval(walkInterval); walkInterval = null; }
+}
 
 // ═══════════════════════════════════════════════════════
 //  RAYCASTING / CLICKS
@@ -919,10 +1068,10 @@ function getClickTargets() {
   return [...clickableFrames, timelineGrp, switchGrp];
 }
 
-canvas.addEventListener('click', e => {
+function handleCanvasTap(clientX, clientY) {
   if (!state.entered) return;
-  mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  mouse.x = (clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(clientY / window.innerHeight) * 2 + 1;
   raycaster.setFromCamera(mouse, camera);
 
   const allMeshes = [];
@@ -945,14 +1094,15 @@ canvas.addEventListener('click', e => {
     if (mem) openMemory(mem);
     return;
   }
-  // Walk up tree
   hits.forEach(h => {
     const grp = h.object.parent?.parent || h.object.parent || h.object;
     if (grp?.userData?.isSwitch) turnOnLights();
     else if (grp?.userData?.isTimeline) openTimeline();
     else if (grp?.userData?.isFrame) openMemory(memories[grp.userData.memIndex]);
   });
-});
+}
+
+canvas.addEventListener('click', e => { handleCanvasTap(e.clientX, e.clientY); });
 
 // ═══════════════════════════════════════════════════════
 //  LIGHTING SYSTEM
@@ -963,6 +1113,10 @@ function turnOnLights() {
   state.lightsOn = true;
   document.getElementById('switch-hint').classList.remove('visible');
   document.getElementById('hud').classList.add('visible');
+  // Show walk controls on touch devices
+  if (window.matchMedia('(pointer: coarse)').matches) {
+    document.getElementById('mobile-controls').classList.add('visible');
+  }
   // Hide the aura once lights are on
   auraRing.visible = false;
   switchSpot.intensity = 0;
@@ -1005,11 +1159,14 @@ function openMemory(mem) {
 
   document.getElementById('dark-overlay').classList.add('active');
   panel.classList.add('open');
+  document.getElementById('mobile-controls').classList.remove('visible');
 }
 
 function closeMemory() {
   document.getElementById('memory-panel').classList.remove('open');
   document.getElementById('dark-overlay').classList.remove('active');
+  if (state.lightsOn && window.matchMedia('(pointer: coarse)').matches)
+    document.getElementById('mobile-controls').classList.add('visible');
 }
 
 function playVoiceNote() {
@@ -1028,10 +1185,13 @@ function playVoiceNote() {
 function openTimeline() {
   document.getElementById('dark-overlay').classList.add('active');
   document.getElementById('timeline-panel').classList.add('open');
+  document.getElementById('mobile-controls').classList.remove('visible');
 }
 function closeTimeline() {
   document.getElementById('timeline-panel').classList.remove('open');
   document.getElementById('dark-overlay').classList.remove('active');
+  if (state.lightsOn && window.matchMedia('(pointer: coarse)').matches)
+    document.getElementById('mobile-controls').classList.add('visible');
 }
 function openMilestone(i) {
   const ms = milestones[i];
@@ -1090,6 +1250,7 @@ function missedLetter() {
 function openVideoLetter() {
   document.getElementById('dark-overlay').classList.add('active');
   document.getElementById('video-overlay').classList.add('open');
+  document.getElementById('mobile-controls').classList.remove('visible');
   pauseJazz();
 }
 
@@ -1104,6 +1265,8 @@ function closeVideo() {
   }
 
   document.getElementById('dark-overlay').classList.remove('active');
+  if (state.lightsOn && window.matchMedia('(pointer: coarse)').matches)
+    document.getElementById('mobile-controls').classList.add('visible');
   resumeJazz();
 
   if (!state.letterWatched) {
@@ -1157,6 +1320,7 @@ function openArchive() {
   }
   document.getElementById('dark-overlay').classList.add('active');
   panel.classList.add('open');
+  document.getElementById("mobile-controls").classList.remove("visible");
 }
 
 function replayFromArchive(i) {
@@ -1168,17 +1332,17 @@ function closeArchive() {
   document.getElementById('archive-panel').classList.remove('open');
   document.getElementById('dark-overlay').classList.remove('active');
 }
+  if (state.lightsOn && window.matchMedia("(pointer: coarse)").matches)
+    document.getElementById("mobile-controls").classList.add("visible");
 
 // ═══════════════════════════════════════════════════════
 //  AUDIO
 // ═══════════════════════════════════════════════════════
 let jazzAudio = null;
 function startJazz() {
-  // 🛠 Replace src with your audio file: audio/jazz.mp3
-  // For now, uses a placeholder tone
   try {
     if (!jazzAudio) {
-      jazzAudio = new Audio('audio/jazz.mp3');
+      jazzAudio = new Audio('audio/adura.mp3');
       jazzAudio.loop = true;
       jazzAudio.volume = 0;
     }
@@ -1224,15 +1388,19 @@ function enterMuseum() {
 
 function animateDoorOpen() {
   doorOpen = true;
-  // Door swings open, camera moves in facing the switch
+  // Door swings open, camera glides forward toward the switch
   setTimeout(() => {
-    targetCamPos.set(0, 1.7, 3.5);
+    targetCamPos.set(0, 1.7, 3.2);
     // Look slightly left toward where the switch is
-    targetLookAt.set(-W/2 + 1.5, 1.2, 3.5);
+    targetLookAt.set(-W/2 + 1.5, 1.2, 3.2);
     setTimeout(() => {
+      const isTouch = window.matchMedia('(pointer: coarse)').matches;
+      document.getElementById('hint-text').textContent = isTouch
+        ? 'Tap the light switch to begin'
+        : 'Find the light switch to begin';
       document.getElementById('switch-hint').classList.add('visible');
     }, 2000);
-  }, 1000);
+  }, 800);
 }
 
 // ═══════════════════════════════════════════════════════
