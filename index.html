@@ -726,10 +726,10 @@
 //  The museum photos (media/) are used as fallback if landing/ doesn't exist.
 // ═══════════════════════════════════════
 
-// ── Populate this list with your 80 landing photos ──
+// ── Populate this list with your 70 landing photos ──
 // Format: 'landing/yourfilename.jpg'
-// We pre-populate 80 slots; add real filenames as you add photos.
-const LANDING_PHOTOS_80 = Array.from({length:80}, (_,i) => `landing/${String(i+1).padStart(3,'0')}.jpg`);
+// We pre-populate 70 slots; add real filenames as you add photos.
+const LANDING_PHOTOS_70 = Array.from({length:70}, (_,i) => `landing/${String(i+1).padStart(3,'0')}.jpg`);
 
 // Fallback to museum photos if landing/ folder isn't set up yet
 const LANDING_PHOTOS_FALLBACK = [
@@ -740,7 +740,7 @@ const LANDING_PHOTOS_FALLBACK = [
 
 (function initLandingSmack() {
   const container = document.getElementById('landing-photos');
-  let pool = [...LANDING_PHOTOS_80].sort(()=>Math.random()-.5);
+  let pool = [...LANDING_PHOTOS_70].sort(()=>Math.random()-.5);
   let loadedCount = 0;
   let smackQueue = [];
   let smacking = false;
@@ -1029,20 +1029,22 @@ function loadWallVideoIntoFrame(grp,mem){
 }
 
 // ─ FRAME POSITIONS ─
-// apr.MOV (memIndex 9) is now CENTER BACK WALL — the most prominent spot.
-// Timeline plaque moves to left wall near entry.
+// apr.MOV (memIndex 9) is CENTER BACK WALL — the most prominent spot.
+// Timeline plaque is on the RIGHT wall near entry (z=3.5) — away from all photo frames.
+// Left wall: 4 frames evenly spread at -3.5, -1.17, 1.17, 3.5
+// Right wall: 3 frames at -3.5, 0, 3.5 — no overlap with timeline
 const framePositions=[
   {pos:[-4.78,FRAME_ROW_Y,BACK_Z], ry:0,           memIndex:0},   // back left-1: first photo
   {pos:[-2.62,FRAME_ROW_Y,BACK_Z], ry:0,           memIndex:1},   // back left-2: sept
   {pos:[ 2.62,FRAME_ROW_Y,BACK_Z], ry:0,           memIndex:2},   // back right-1: oct
-  {pos:[ 4.78,FRAME_ROW_Y,BACK_Z], ry:0,           memIndex:10},  // back right-2: extra still
-  {pos:[LEFT_X,FRAME_ROW_Y,-3.2], ry:Math.PI/2,   memIndex:3},   // left wall: nov
-  {pos:[LEFT_X,FRAME_ROW_Y,-1.1], ry:Math.PI/2,   memIndex:4},   // left wall: dec
-  {pos:[LEFT_X,FRAME_ROW_Y, 1.1], ry:Math.PI/2,   memIndex:5},   // left wall: jan
-  {pos:[LEFT_X,FRAME_ROW_Y, 3.2], ry:Math.PI/2,   memIndex:6},   // left wall: feb
-  {pos:[RIGHT_X,FRAME_ROW_Y,-3.58],ry:-Math.PI/2,  memIndex:7},   // right wall: mar
-  {pos:[RIGHT_X,FRAME_ROW_Y,   0], ry:-Math.PI/2,  memIndex:8},   // right wall: sleeping beauty (HM)
-  {pos:[RIGHT_X,FRAME_ROW_Y, 3.58],ry:-Math.PI/2,  memIndex:10},  // right wall: extra
+  {pos:[ 4.78,FRAME_ROW_Y,BACK_Z], ry:0,           memIndex:10},  // back right-2: first_pic (unique here)
+  {pos:[LEFT_X,FRAME_ROW_Y,-3.5],  ry:Math.PI/2,   memIndex:3},   // left wall: nov
+  {pos:[LEFT_X,FRAME_ROW_Y,-1.17], ry:Math.PI/2,   memIndex:4},   // left wall: dec
+  {pos:[LEFT_X,FRAME_ROW_Y, 1.17], ry:Math.PI/2,   memIndex:5},   // left wall: jan
+  {pos:[LEFT_X,FRAME_ROW_Y, 3.5],  ry:Math.PI/2,   memIndex:6},   // left wall: feb
+  {pos:[RIGHT_X,FRAME_ROW_Y,-3.5], ry:-Math.PI/2,  memIndex:7},   // right wall: mar
+  {pos:[RIGHT_X,FRAME_ROW_Y,  0],  ry:-Math.PI/2,  memIndex:8},   // right wall: sleeping beauty (HM)
+  // right wall z=3.5 is reserved for the timeline plaque
 ];
 
 const clickableFrames=[];
@@ -1072,10 +1074,10 @@ aprPlaqueMesh.position.set(0,-1.05,0.04); aprGrp.add(aprPlaqueMesh);
 loadWallVideoIntoFrame(aprGrp, aprMem);  // now just shows emoji placeholder
 scene.add(aprGrp); clickableFrames.push(aprGrp);
 
-// Timeline plaque — centered on left wall for easy discovery
+// Timeline plaque — RIGHT wall near entry, z=3.5 (no photo frames here)
 const timelineGrp=new THREE.Group();
-timelineGrp.position.set(LEFT_X, FRAME_ROW_Y+.06, 0);  // centered on left wall
-timelineGrp.rotation.y = Math.PI/2;
+timelineGrp.position.set(RIGHT_X, FRAME_ROW_Y+.06, 3.5);
+timelineGrp.rotation.y = -Math.PI/2;
 timelineGrp.userData.isTimeline=true;
 const tPlaque=new THREE.Mesh(new THREE.BoxGeometry(2.45,2.05,.07),goldMat); timelineGrp.add(tPlaque);
 const tInner=new THREE.Mesh(new THREE.BoxGeometry(2.24,1.84,.05),new THREE.MeshStandardMaterial({color:0x08070e}));
@@ -1083,7 +1085,7 @@ tInner.position.z=.02; timelineGrp.add(tInner);
 const tLabel=document.createElement('canvas'); tLabel.width=512; tLabel.height=360;
 const tlctx=tLabel.getContext('2d');
 tlctx.fillStyle='#c9a84c'; tlctx.font='italic 34px serif'; tlctx.textAlign='center'; tlctx.fillText('Our Story',256,56);
-tlctx.font='20px serif'; tlctx.fillStyle='rgba(240,230,211,0.7)'; tlctx.fillText('Tap to open our timeline →',256,116);
+tlctx.font='20px serif'; tlctx.fillStyle='rgba(240,230,211,0.7)'; tlctx.fillText('Tap to open our timeline ←',256,116);
 const tTex=new THREE.CanvasTexture(tLabel); tTex.needsUpdate=true;
 const tMesh=new THREE.Mesh(new THREE.PlaneGeometry(2.06,1.68),new THREE.MeshBasicMaterial({map:tTex,transparent:true}));
 tMesh.position.z=.05; timelineGrp.add(tMesh); scene.add(timelineGrp);
@@ -1134,8 +1136,8 @@ framePositions.forEach(({pos})=>{
   scene.add(s);scene.add(s.target);frameSpots.push(s);
 });
 const timelineSpot=new THREE.SpotLight(0xfff1d8,0,14,Math.PI/6,.38,1.95);
-timelineSpot.position.set(LEFT_X+3, H-.42, 0);
-timelineSpot.target.position.set(LEFT_X, FRAME_ROW_Y, 0);
+timelineSpot.position.set(RIGHT_X-3, H-.42, 3.5);
+timelineSpot.target.position.set(RIGHT_X, FRAME_ROW_Y, 3.5);
 scene.add(timelineSpot);scene.add(timelineSpot.target);frameSpots.push(timelineSpot);
 // Dramatic spotlight on the featured apr.MOV center frame
 const aprSpot=new THREE.SpotLight(0xfff5d0,0,7,Math.PI/5,.3,1.8);
@@ -1345,6 +1347,8 @@ document.getElementById('video-overlay').addEventListener('click',e=>{
 // ═══════════════════════════════════════
 //  MEMORY PANEL
 // ═══════════════════════════════════════
+let frameSoundEl = null;
+
 function openMemory(mem){
   state.currentMemory=mem;duckAudio();
   const photo=document.getElementById('memory-photo');
@@ -1358,10 +1362,23 @@ function openMemory(mem){
   } else if(mem.photo){
     const img=document.createElement('img');img.alt='';img.src=mem.photo;photo.appendChild(img);
   } else {photo.textContent=mem.emoji||'📸';photo.style.fontSize='3.5rem';}
+
+  // Stop any previously playing frame audio
+  if(frameSoundEl){ frameSoundEl.pause(); frameSoundEl.currentTime=0; frameSoundEl=null; }
+  // Play this frame's audio if it has one
+  if(mem.audio){
+    frameSoundEl = new Audio(mem.audio);
+    frameSoundEl.loop = true;
+    frameSoundEl.volume = 0.5;
+    frameSoundEl.play().catch(()=>{});
+  }
+
   document.getElementById('memory-panel').classList.add('open');syncModalLayer();
 }
 function closeMemory(){
   document.querySelectorAll('#memory-photo video').forEach(v=>{v.pause();v.currentTime=0;});
+  // Stop frame-specific audio
+  if(frameSoundEl){ frameSoundEl.pause(); frameSoundEl.currentTime=0; frameSoundEl=null; }
   document.getElementById('memory-panel').classList.remove('open');
   syncModalLayer();
   // Ensure bg music resumes
