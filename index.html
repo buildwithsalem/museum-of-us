@@ -179,17 +179,18 @@
     #hud.visible { opacity: 1; }
 
     #switch-hint {
-      position: fixed; bottom: 2.5rem; left: 50%;
+      position: fixed; bottom: calc(2rem + env(safe-area-inset-bottom)); left: 50%;
       transform: translateX(-50%);
-      font-family: 'Cinzel', serif; font-size: clamp(0.65rem,2vw,0.82rem);
+      font-family: 'Cinzel', serif; font-size: clamp(0.62rem,2vw,0.78rem);
       color: rgba(201,168,76,0.7); letter-spacing: 0.25em; z-index: 20;
       pointer-events: none; opacity: 0; transition: opacity 1.5s ease;
       text-align: center; text-transform: uppercase;
       display: flex; align-items: center; gap: 0.8rem;
       background: rgba(6,5,10,0.6);
       border: 1px solid rgba(201,168,76,0.15);
-      padding: 0.7rem 1.5rem;
+      padding: 0.65rem 1.3rem;
       backdrop-filter: blur(8px);
+      white-space: nowrap;
     }
     #switch-hint.visible { opacity: 1; animation: hint-pulse 2.5s ease-in-out infinite; }
     #switch-hint .arrow { animation: bounce-left 1.2s ease-in-out infinite; }
@@ -225,6 +226,8 @@
         0 30px 80px rgba(0,0,0,0.8),
         0 0 60px rgba(80,40,120,0.1);
       overflow: hidden;
+      max-height: 88dvh;
+      display: flex; flex-direction: column;
     }
     /* Top gold accent bar */
     .memory-card::before {
@@ -239,11 +242,13 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 3rem; overflow: hidden;
       border-bottom: 1px solid rgba(201,168,76,0.12);
+      flex-shrink: 0;
+      max-height: 55dvh;
     }
     .memory-photo img { width: 100%; height: 100%; object-fit: cover; }
-    .memory-photo video { width: 100%; display: block; }
+    .memory-photo video { width: 100%; height: 100%; object-fit: contain; display: block; }
 
-    .memory-body { padding: 1.8rem 2rem 2rem; }
+    .memory-body { padding: 1.8rem 2rem 2rem; overflow-y: auto; }
 
     .memory-tag {
       font-family: 'Cinzel', serif;
@@ -273,14 +278,15 @@
     #video-overlay {
       position: fixed; inset: 0; z-index: 80;
       display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 1.5rem;
+      align-items: center; justify-content: center; gap: 1.2rem;
       opacity: 0; pointer-events: none; transition: opacity 0.6s ease;
+      padding: 1rem;
     }
     #video-overlay.open { opacity: 1; pointer-events: all; }
     .video-frame {
       border: 1px solid rgba(201,168,76,0.3);
       box-shadow: 0 0 80px rgba(201,168,76,0.15), 0 30px 80px rgba(0,0,0,0.8);
-      max-width: 640px; width: 92%; position: relative;
+      max-width: 640px; width: 100%; position: relative;
       background: #000;
     }
     .video-frame::before {
@@ -389,20 +395,24 @@
        ARCHIVE
     ═══════════════════════════════════════ */
     #archive-btn {
-      position: fixed; bottom: 2rem; right: 2rem; z-index: 70;
+      position: fixed; bottom: 2rem; right: 1.2rem; z-index: 70;
       background: rgba(14,13,20,0.9); backdrop-filter: blur(8px);
       border: 1px solid rgba(201,168,76,0.3); color: var(--gold);
-      width: 48px; height: 48px; font-size: 1.2rem;
+      width: 54px; height: 54px; font-size: 1.3rem;
       cursor: pointer; display: none; align-items: center; justify-content: center;
-      transition: all 0.25s; position: relative;
+      transition: all 0.25s;
+      border-radius: 4px;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
     #archive-btn:hover { border-color: var(--gold); background: rgba(201,168,76,0.1); }
     #archive-btn .badge {
-      position: absolute; top: -5px; right: -5px;
-      width: 16px; height: 16px; border-radius: 50%;
-      background: #7b2d3a; font-size: 0.58rem;
+      position: absolute; top: -6px; right: -6px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #7b2d3a; font-size: 0.6rem;
       display: flex; align-items: center; justify-content: center;
       color: var(--cream); font-family: 'Cinzel', serif;
+      pointer-events: none;
     }
 
     #archive-panel {
@@ -458,7 +468,7 @@
        TOAST
     ═══════════════════════════════════════ */
     #toast {
-      position: fixed; bottom: 2rem; left: 50%;
+      position: fixed; bottom: calc(5rem + env(safe-area-inset-bottom)); left: 50%;
       transform: translateX(-50%) translateY(80px);
       z-index: 90;
       background: rgba(14,13,20,0.95); backdrop-filter: blur(12px);
@@ -476,7 +486,7 @@
     ═══════════════════════════════════════ */
     #mobile-controls {
       display: none; position: fixed;
-      bottom: calc(1.2rem + env(safe-area-inset-bottom));
+      bottom: calc(5.5rem + env(safe-area-inset-bottom));
       left: 50%; transform: translateX(-50%);
       z-index: 30; gap: 0.5rem; flex-direction: row; align-items: center;
     }
@@ -484,10 +494,11 @@
     .walk-btn {
       background: rgba(14,13,20,0.85); backdrop-filter: blur(8px);
       border: 1px solid rgba(201,168,76,0.3); color: var(--gold);
-      font-size: 1rem; width: 48px; height: 48px;
+      font-size: 1.1rem; width: 54px; height: 54px;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; touch-action: manipulation; user-select: none;
       -webkit-tap-highlight-color: transparent;
+      border-radius: 4px;
     }
     .walk-btn:active { background: rgba(201,168,76,0.15); }
 
@@ -519,10 +530,15 @@
     }
 
     @media (max-width: 600px) {
-      .memory-card { width: 95%; max-height: 90dvh; overflow-y: auto; }
-      .memory-body { padding: 1.4rem 1.4rem 1.6rem; }
+      .memory-card { width: 96%; }
+      .memory-photo { max-height: 50dvh; aspect-ratio: unset; min-height: 200px; }
+      .memory-body { padding: 1.2rem 1.3rem 1.5rem; }
       .timeline-header, .archive-header { padding: 2rem 1.4rem 1.2rem; }
       .timeline-scroll, .archive-scroll { padding: 1.2rem 1.4rem 2rem; }
+      #archive-btn { bottom: calc(1.5rem + env(safe-area-inset-bottom)); right: 1rem; }
+      #switch-hint { bottom: 1.5rem; font-size: 0.72rem; padding: 0.6rem 1.1rem; }
+      .video-close { font-size: 0.6rem; padding: 0.65rem 1.5rem; }
+      #toast { bottom: calc(1rem + env(safe-area-inset-bottom)); }
     }
 
     ::-webkit-scrollbar { width: 3px; }
@@ -744,13 +760,13 @@ const LANDING_PHOTOS_FALLBACK = [
     // Shuffle
     const shuffled = [...photoList].sort(()=>Math.random()-.5);
     let idx = 0;
-    // Smack one photo every 350ms, cycling through the list
+    // Smack one photo every 100ms, cycling through the list
     const interval = setInterval(() => {
       smackPhoto(shuffled[idx % shuffled.length], idx);
       idx++;
-      // After going through all photos, slow down to 1 per 1.5s to keep it alive
+      // After going through all photos, slow down to 1 per 600ms to keep it alive
       if(idx >= shuffled.length) clearInterval(interval), slowSmack(shuffled);
-    }, 350);
+    }, 100);
   }
 
   function slowSmack(list) {
@@ -758,7 +774,7 @@ const LANDING_PHOTOS_FALLBACK = [
     setInterval(() => {
       smackPhoto(list[idx % list.length], idx + 999);
       idx++;
-    }, 1800);
+    }, 600);
   }
 
   function smackPhoto(src, idx) {
@@ -1007,20 +1023,9 @@ function rebuildFrameGroup(grp,mem,mediaAspect,photoTex,videoTex){
 }
 
 function loadWallVideoIntoFrame(grp,mem){
+  // Show emoji/placeholder on wall — video only plays in the popup modal
   rebuildFrameGroup(grp,mem,16/9,null,null);
-  const v=document.createElement('video');
-  v.src=mem.video; v.loop=true; v.muted=mem.videoMuted!==false; v.playsInline=true;
-  v.setAttribute('playsinline',''); v.setAttribute('webkit-playsinline','');
-  grp.userData.wallVideoEl=v;
-  const finalize=()=>{
-    const wpx=v.videoWidth||1280,hpx=v.videoHeight||720;
-    const aspect=wpx/Math.max(hpx,1);
-    const vt=new THREE.VideoTexture(v); vt.encoding=THREE.sRGBEncoding;
-    wallSceneVideoTextures.push(vt); rebuildFrameGroup(grp,mem,aspect,null,vt); v.play().catch(()=>{});
-  };
-  v.addEventListener('loadeddata',finalize,{once:true});
-  v.addEventListener('error',()=>rebuildFrameGroup(grp,mem,16/9,null,null),{once:true});
-  try{v.load();}catch(e){}
+  // Don't auto-load or play the video in the wall frame
 }
 
 // ─ FRAME POSITIONS ─
@@ -1031,10 +1036,10 @@ const framePositions=[
   {pos:[-2.62,FRAME_ROW_Y,BACK_Z], ry:0,           memIndex:1},   // back left-2: sept
   {pos:[ 2.62,FRAME_ROW_Y,BACK_Z], ry:0,           memIndex:2},   // back right-1: oct
   {pos:[ 4.78,FRAME_ROW_Y,BACK_Z], ry:0,           memIndex:10},  // back right-2: extra still
-  {pos:[LEFT_X,FRAME_ROW_Y,-3.68], ry:Math.PI/2,   memIndex:3},   // left wall: nov
-  {pos:[LEFT_X,FRAME_ROW_Y,-1.22], ry:Math.PI/2,   memIndex:4},   // left wall: dec
-  {pos:[LEFT_X,FRAME_ROW_Y, 1.22], ry:Math.PI/2,   memIndex:5},   // left wall: jan
-  {pos:[LEFT_X,FRAME_ROW_Y, 3.68], ry:Math.PI/2,   memIndex:6},   // left wall: feb
+  {pos:[LEFT_X,FRAME_ROW_Y,-3.2], ry:Math.PI/2,   memIndex:3},   // left wall: nov
+  {pos:[LEFT_X,FRAME_ROW_Y,-1.1], ry:Math.PI/2,   memIndex:4},   // left wall: dec
+  {pos:[LEFT_X,FRAME_ROW_Y, 1.1], ry:Math.PI/2,   memIndex:5},   // left wall: jan
+  {pos:[LEFT_X,FRAME_ROW_Y, 3.2], ry:Math.PI/2,   memIndex:6},   // left wall: feb
   {pos:[RIGHT_X,FRAME_ROW_Y,-3.58],ry:-Math.PI/2,  memIndex:7},   // right wall: mar
   {pos:[RIGHT_X,FRAME_ROW_Y,   0], ry:-Math.PI/2,  memIndex:8},   // right wall: sleeping beauty (HM)
   {pos:[RIGHT_X,FRAME_ROW_Y, 3.58],ry:-Math.PI/2,  memIndex:10},  // right wall: extra
@@ -1047,15 +1052,9 @@ framePositions.forEach(({pos,ry,memIndex})=>{
   const grp=new THREE.Group();
   grp.position.set(...pos); grp.rotation.y=ry;
   grp.userData.memIndex=memIndex; grp.userData.isFrame=true;
-  if(mem&&mem.video) loadWallVideoIntoFrame(grp,mem);
-  else rebuildFrameGroup(grp,mem,4/3,null,null);
+  // Always show emoji placeholder on wall — photo/video loads only when tapped
+  rebuildFrameGroup(grp,mem,4/3,null,null);
   scene.add(grp); clickableFrames.push(grp);
-  if(mem&&mem.photo&&!mem.video){
-    texLoader.load(mem.photo,(tex)=>{
-      const img=tex.image; const aspect=(img.naturalWidth||img.width)/Math.max(img.naturalHeight||img.height,1);
-      rebuildFrameGroup(grp,mem,aspect,tex,null);
-    },undefined,()=>rebuildFrameGroup(grp,mem,4/3,null,null));
-  }
 });
 
 // ── FEATURED VIDEO FRAME (apr.MOV) — center back wall, the focal piece ──
@@ -1070,12 +1069,12 @@ const aprPlaqueC=document.createElement('canvas'); aprPlaqueC.width=512; aprPlaq
 const apCtx=aprPlaqueC.getContext('2d'); apCtx.fillStyle='#c9a84c'; apCtx.font='italic 28px serif'; apCtx.textAlign='center'; apCtx.textBaseline='middle'; apCtx.fillText('✦  April 2026  ✦',256,40);
 const aprPlaqueMesh=new THREE.Mesh(new THREE.PlaneGeometry(2.4,0.22),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(aprPlaqueC),transparent:true}));
 aprPlaqueMesh.position.set(0,-1.05,0.04); aprGrp.add(aprPlaqueMesh);
-loadWallVideoIntoFrame(aprGrp, aprMem);
+loadWallVideoIntoFrame(aprGrp, aprMem);  // now just shows emoji placeholder
 scene.add(aprGrp); clickableFrames.push(aprGrp);
 
-// Timeline plaque — moved to LEFT wall near entry so it's easy to find
+// Timeline plaque — centered on left wall for easy discovery
 const timelineGrp=new THREE.Group();
-timelineGrp.position.set(LEFT_X, FRAME_ROW_Y+.06, 3.0);
+timelineGrp.position.set(LEFT_X, FRAME_ROW_Y+.06, 0);  // centered on left wall
 timelineGrp.rotation.y = Math.PI/2;
 timelineGrp.userData.isTimeline=true;
 const tPlaque=new THREE.Mesh(new THREE.BoxGeometry(2.45,2.05,.07),goldMat); timelineGrp.add(tPlaque);
@@ -1135,8 +1134,8 @@ framePositions.forEach(({pos})=>{
   scene.add(s);scene.add(s.target);frameSpots.push(s);
 });
 const timelineSpot=new THREE.SpotLight(0xfff1d8,0,14,Math.PI/6,.38,1.95);
-timelineSpot.position.set(LEFT_X+3, H-.42, 3.0);
-timelineSpot.target.position.set(LEFT_X, FRAME_ROW_Y, 3.0);
+timelineSpot.position.set(LEFT_X+3, H-.42, 0);
+timelineSpot.target.position.set(LEFT_X, FRAME_ROW_Y, 0);
 scene.add(timelineSpot);scene.add(timelineSpot.target);frameSpots.push(timelineSpot);
 // Dramatic spotlight on the featured apr.MOV center frame
 const aprSpot=new THREE.SpotLight(0xfff5d0,0,7,Math.PI/5,.3,1.8);
@@ -1168,7 +1167,13 @@ function fadeGain(node,from,to,durationMs){
   node.gain.linearRampToValueAtTime(to,now+durationMs/1000);
 }
 function duckAudio(){if(!audioCtx)return;fadeGain(chatterGain,chatterGain.gain.value,VOL.chatterDucked,600);fadeGain(bgMusicGain,bgMusicGain.gain.value,VOL.bgDucked,600);}
-function restoreAudio(){if(!audioCtx)return;fadeGain(chatterGain,chatterGain.gain.value,VOL.chatterNormal,1200);fadeGain(bgMusicGain,bgMusicGain.gain.value,VOL.bgNormal,1200);}
+function restoreAudio(){
+  if(!audioCtx)return;
+  fadeGain(chatterGain,chatterGain.gain.value,VOL.chatterNormal,1200);
+  fadeGain(bgMusicGain,bgMusicGain.gain.value,VOL.bgNormal,1200);
+  // Ensure bg music is actually playing (iOS can pause it)
+  if(bgMusicEl&&bgMusicEl.paused){bgMusicEl.play().catch(()=>{});}
+}
 
 function makeVoiceBurst(){
   if(!audioCtx)return;
@@ -1357,14 +1362,20 @@ function openMemory(mem){
 }
 function closeMemory(){
   document.querySelectorAll('#memory-photo video').forEach(v=>{v.pause();v.currentTime=0;});
-  document.getElementById('memory-panel').classList.remove('open');syncModalLayer();restoreAudio();
+  document.getElementById('memory-panel').classList.remove('open');
+  syncModalLayer();
+  // Ensure bg music resumes
+  restoreAudio();
 }
-
+function closeTimeline(){
+  document.getElementById('timeline-panel').classList.remove('open');
+  syncModalLayer();
+  restoreAudio();
+}
 // ═══════════════════════════════════════
 //  TIMELINE
 // ═══════════════════════════════════════
 function openTimeline(){duckAudio();document.getElementById('timeline-panel').classList.add('open');syncModalLayer();}
-function closeTimeline(){document.getElementById('timeline-panel').classList.remove('open');syncModalLayer();restoreAudio();}
 // Map milestone index → memory index so clicking a milestone shows the right photo
 // Milestones: 0=May, 1=Jun/Jul, 2=Aug, 3=Sep, 4=Oct, 5=Nov, 6=Dec, 7=Jan, 8=Feb, 9=Mar, 10=Apr, 11=Now
 const MILESTONE_TO_MEMORY = [
@@ -1434,9 +1445,24 @@ function openVideoLetter(){
 }
 function closeVideo(){
   document.getElementById('video-overlay').classList.remove('open');
-  const video=document.getElementById('letter-video');video.pause();video.currentTime=0;
-  if(state.letterPending){showPendingEnvelope();state.letterPending=false;}
-  syncModalLayer();restoreAudio();scheduleNextLetter();state.letterWatched=true;
+  const video=document.getElementById('letter-video');
+  // Check if the video was watched to completion (within 3 seconds of end)
+  const watchedEnough = video.duration && (video.currentTime >= video.duration - 3);
+  video.pause();video.currentTime=0;
+  if(state.letterPending){
+    if(watchedEnough){
+      // Fully watched — no archive entry needed, just show toast
+      showToast('💌 Letter received — thank you for watching 🌹');
+    } else {
+      // Did not finish watching — add to archive
+      showPendingEnvelope();
+    }
+    state.letterPending=false;
+  }
+  syncModalLayer();
+  // Restore background music - keep playing from where it was
+  restoreAudio();
+  scheduleNextLetter();state.letterWatched=true;
 }
 function showPendingEnvelope(){
   document.getElementById('archive-btn').style.display='flex';addToArchive('pending');
@@ -1474,7 +1500,11 @@ function openArchive(){
   duckAudio();document.getElementById('archive-panel').classList.add('open');syncModalLayer();
 }
 function replayFromArchive(){closeArchive();openVideoLetter();}
-function closeArchive(){document.getElementById('archive-panel').classList.remove('open');syncModalLayer();restoreAudio();}
+function closeArchive(){
+  document.getElementById('archive-panel').classList.remove('open');
+  syncModalLayer();
+  restoreAudio();
+}
 
 // ═══════════════════════════════════════
 //  TOAST
