@@ -705,7 +705,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 
-// ═══════════════════════════════════════
+/*// ═══════════════════════════════════════
 //  LANDING PHOTO RAIN
 //  Photos pop in at random positions, sizes, and rotations.
 //  Some overlap — that's intentional, like a scattered gallery wall.
@@ -829,7 +829,7 @@ const LANDING_PHOTOS_FALLBACK = [
     }
   }
 })();
-
+*/
 
 // ═══════════════════════════════════════
 //  STATE + DATA
@@ -1168,7 +1168,7 @@ function initAudio(){
   masterGain=audioCtx.createGain();masterGain.gain.value=1;masterGain.connect(audioCtx.destination);
   chatterGain=audioCtx.createGain();chatterGain.gain.value=0;chatterGain.connect(masterGain);
   // Museum ambience — constant background atmosphere
-  ambienceEl=new Audio('https://res.cloudinary.com/dzgabvxwv/raw/upload/v1778098432/audio/ambience.mp3');
+  ambienceEl=new Audio('https://res.cloudinary.com/dzgabvxwv/video/upload/v1778099330/ambience.mp3');
   ambienceEl.loop=true;
   ambienceEl.setAttribute('playsinline','');
   ambienceEl.setAttribute('webkit-playsinline','');
