@@ -245,8 +245,8 @@
       flex-shrink: 0;
       max-height: 55dvh;
     }
-    .memory-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .memory-photo video { width: 100%; height: 100%; object-fit: contain; display: block; background: #000; }
+    .memory-photo img { width: 100%; height: 100%; object-fit: cover; }
+    .memory-photo video { width: 100%; height: 100%; object-fit: contain; display: block; }
 
     .memory-body { padding: 1.8rem 2rem 2rem; overflow-y: auto; }
 
@@ -602,7 +602,7 @@
 <div id="video-overlay">
   <div class="video-frame">
     <video id="letter-video" playsinline webkit-playsinline preload="auto" controls>
-      <source src="media/apr.MOV" type="video/quicktime">
+      <source src="https://res.cloudinary.com/dzgabvxwv/video/upload/media/apr.MOV" type="video/quicktime">
     </video>
     <div class="video-placeholder" id="video-placeholder" style="display:none">
       <div class="play-icon">▶</div>
@@ -729,13 +729,13 @@
 // ── Populate this list with your 70 landing photos ──
 // Format: 'landing/yourfilename.jpg'
 // We pre-populate 70 slots; add real filenames as you add photos.
-const LANDING_PHOTOS_70 = Array.from({length:70}, (_,i) => `landing/${String(i+1).padStart(3,'0')}.jpg`);
+const LANDING_PHOTOS_70 = Array.from({length:70}, (_,i) => `https://res.cloudinary.com/dzgabvxwv/image/upload/landing/${String(i+1).padStart(3,'0')}.jpg`);
 
 // Fallback to museum photos if landing/ folder isn't set up yet
 const LANDING_PHOTOS_FALLBACK = [
-  'media/first_pic.png','media/sept.png','media/oct.png','media/nov.png',
-  'media/dec.png','media/jan.png','media/feb.png','media/mar.png',
-  'media/first_actual.JPG','media/imnotsleepy.png',
+  'https://res.cloudinary.com/dzgabvxwv/image/upload/media/first_pic.png','https://res.cloudinary.com/dzgabvxwv/image/upload/media/sept.png','https://res.cloudinary.com/dzgabvxwv/image/upload/media/oct.png','https://res.cloudinary.com/dzgabvxwv/image/upload/media/nov.png',
+  'https://res.cloudinary.com/dzgabvxwv/image/upload/media/dec.png','https://res.cloudinary.com/dzgabvxwv/image/upload/media/jan.png','https://res.cloudinary.com/dzgabvxwv/image/upload/media/feb.png','https://res.cloudinary.com/dzgabvxwv/image/upload/media/mar.png',
+  'https://res.cloudinary.com/dzgabvxwv/image/upload/media/first_actual.JPG','https://res.cloudinary.com/dzgabvxwv/image/upload/media/imnotsleepy.png',
 ];
 
 (function initLandingSmack() {
@@ -841,17 +841,17 @@ const state = {
 };
 
 const memories = [
-  { id:'frame1',  date:'The First One',   caption:'"The night I knew I wanted to collect every moment with you."',       emoji:'🌙',  photo:'media/first_actual.JPG', audio:'audio/adura.mp3' },
-  { id:'frame2',  date:'September',       caption:'"Every ordinary moment with you becomes extraordinary."',              emoji:'🌅',  photo:'media/sept.png' },
-  { id:'frame3',  date:'October',         caption:'"You make every season feel like the best one."',                     emoji:'🍂',  photo:'media/oct.png' },
-  { id:'frame4',  date:'November',        caption:'"Grateful. For you, always."',                                        emoji:'🍁',  photo:'media/nov.png' },
-  { id:'frame5',  date:'December',        caption:'"The lights, the cold, you. I wanted time to stop."',                emoji:'❄️',  photo:'media/dec.png' },
-  { id:'frame6',  date:'January',         caption:'"A new year, but the same feeling. You."',                          emoji:'✨',  photo:'media/jan.png' },
-  { id:'frame7',  date:'February',        caption:'"Every day feels like the one made for us."',                         emoji:'💛',  photo:'media/feb.png' },
-  { id:'frame8',  date:'March',           caption:'"Watching us grow. Still my favorite thing to witness."',             emoji:'🌸',  photo:'media/mar.png' },
-  { id:'frame9',  date:'Sleeping Beauty', caption:'"I am not sleepy, I am not sleepy. Look at you 😒"',                 emoji:'🌙',  photo:'media/imnotsleepy.png', isHM:true },
-  { id:'frameAPR',date:'Strong JoJo',   caption:'"This one lives on the wall too 💌"', emoji:'🎬', video:'media/apr.MOV', videoMuted:false, photoFit:'natural' },
-  { id:'frameX',  date:'One more still',  caption:'"Another moment worth hanging in our gallery."',                      emoji:'💕',  photo:'media/first_pic.png' },
+  { id:'frame1',  date:'The First One',   caption:'"The night I knew I wanted to collect every moment with you."',       emoji:'🌙',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/media/first_actual.JPG', audio:'https://res.cloudinary.com/dzgabvxwv/raw/upload/audio/adura.mp3' },
+  { id:'frame2',  date:'September',       caption:'"Every ordinary moment with you becomes extraordinary."',              emoji:'🌅',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/media/sept.png' },
+  { id:'frame3',  date:'October',         caption:'"You make every season feel like the best one."',                     emoji:'🍂',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/media/oct.png' },
+  { id:'frame4',  date:'November',        caption:'"Grateful. For you, always."',                                        emoji:'🍁',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/media/nov.png' },
+  { id:'frame5',  date:'December',        caption:'"The lights, the cold, you. I wanted time to stop."',                emoji:'❄️',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/media/dec.png' },
+  { id:'frame6',  date:'January',         caption:'"A new year, but the same feeling. You."',                          emoji:'✨',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/media/jan.png' },
+  { id:'frame7',  date:'February',        caption:'"Every day feels like the one made for us."',                         emoji:'💛',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/media/feb.png' },
+  { id:'frame8',  date:'March',           caption:'"Watching us grow. Still my favorite thing to witness."',             emoji:'🌸',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/media/mar.png' },
+  { id:'frame9',  date:'Sleeping Beauty', caption:'"I am not sleepy, I am not sleepy. Look at you 😒"',                 emoji:'🌙',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/media/imnotsleepy.png', isHM:true },
+  { id:'frameAPR',date:'Strong JoJo',   caption:'"This one lives on the wall too 💌"', emoji:'🎬', video:'https://res.cloudinary.com/dzgabvxwv/video/upload/media/apr.MOV', videoMuted:false, photoFit:'natural' },
+  { id:'frameX',  date:'One more still',  caption:'"Another moment worth hanging in our gallery."',                      emoji:'💕',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/media/first_pic.png' },
   { id:'timeline',date:'Our Journey',     caption:'"Every chapter written together."', emoji:'📖', isTimeline:true },
 ];
 
@@ -1072,11 +1072,10 @@ aprPlaqueMesh.position.set(0,-1.05,0.04); aprGrp.add(aprPlaqueMesh);
 loadWallVideoIntoFrame(aprGrp, aprMem);  // now just shows emoji placeholder
 scene.add(aprGrp); clickableFrames.push(aprGrp);
 
-// Timeline plaque — mounted on the FRONT WALL (right side of entry), away from all frames
+// Timeline plaque — centered on left wall for easy discovery
 const timelineGrp=new THREE.Group();
-// Front wall is at z = D/2. Place plaque on the inside face of front wall, right of door
-timelineGrp.position.set(W/2-1.8, FRAME_ROW_Y+.06, D/2-.07);
-timelineGrp.rotation.y = Math.PI;  // face inward (toward room)
+timelineGrp.position.set(LEFT_X, FRAME_ROW_Y+.06, 0);  // centered on left wall
+timelineGrp.rotation.y = Math.PI/2;
 timelineGrp.userData.isTimeline=true;
 const tPlaque=new THREE.Mesh(new THREE.BoxGeometry(2.45,2.05,.07),goldMat); timelineGrp.add(tPlaque);
 const tInner=new THREE.Mesh(new THREE.BoxGeometry(2.24,1.84,.05),new THREE.MeshStandardMaterial({color:0x08070e}));
@@ -1135,8 +1134,8 @@ framePositions.forEach(({pos})=>{
   scene.add(s);scene.add(s.target);frameSpots.push(s);
 });
 const timelineSpot=new THREE.SpotLight(0xfff1d8,0,14,Math.PI/6,.38,1.95);
-timelineSpot.position.set(W/2-1.8, H-.42, D/2-3);
-timelineSpot.target.position.set(W/2-1.8, FRAME_ROW_Y, D/2-.07);
+timelineSpot.position.set(LEFT_X+3, H-.42, 0);
+timelineSpot.target.position.set(LEFT_X, FRAME_ROW_Y, 0);
 scene.add(timelineSpot);scene.add(timelineSpot.target);frameSpots.push(timelineSpot);
 // Dramatic spotlight on the featured apr.MOV center frame
 const aprSpot=new THREE.SpotLight(0xfff5d0,0,7,Math.PI/5,.3,1.8);
@@ -1144,40 +1143,58 @@ aprSpot.position.set(0,H-.3,BACK_Z+3.5);aprSpot.target.position.set(0,FRAME_ROW_
 scene.add(aprSpot);scene.add(aprSpot.target);frameSpots.push(aprSpot);
 
 // ═══════════════════════════════════════
-//  AUDIO (Web Audio chatter + adura.mp3)
+//  AUDIO — Ambience loop + Spotify playlist (hidden)
 // ═══════════════════════════════════════
-let audioCtx=null,masterGain=null,chatterGain=null,bgMusicGain=null,bgMusicEl=null;
-const VOL={chatterNormal:.15,chatterDucked:.03,bgNormal:.4,bgDucked:.1};
+let audioCtx=null,masterGain=null,chatterGain=null,ambienceEl=null,ambienceGain=null;
+
+// Inject hidden Spotify embed once — user gesture unlocks autoplay
+let spotifyInjected=false;
+function injectSpotify(){
+  if(spotifyInjected)return;
+  spotifyInjected=true;
+  const iframe=document.createElement('iframe');
+  iframe.src='https://open.spotify.com/embed/playlist/1jBkRxzuhxLXxJ464qyqiP?utm_source=generator&autoplay=1&theme=0';
+  iframe.width='0';iframe.height='0';
+  iframe.style.cssText='position:fixed;opacity:0;pointer-events:none;border:none;';
+  iframe.allow='autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+  document.body.appendChild(iframe);
+}
 
 function initAudio(){
   if(audioCtx)return;
+  injectSpotify();
   audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-  // iOS: resume context immediately since we're inside a user gesture
   if(audioCtx.state==='suspended')audioCtx.resume();
   masterGain=audioCtx.createGain();masterGain.gain.value=1;masterGain.connect(audioCtx.destination);
   chatterGain=audioCtx.createGain();chatterGain.gain.value=0;chatterGain.connect(masterGain);
-  bgMusicEl=new Audio('audio/adura.mp3');bgMusicEl.loop=true;
-  bgMusicEl.setAttribute('playsinline','');
-  bgMusicEl.setAttribute('webkit-playsinline','');
-  const src=audioCtx.createMediaElementSource(bgMusicEl);
-  bgMusicGain=audioCtx.createGain();bgMusicGain.gain.value=0;src.connect(bgMusicGain);bgMusicGain.connect(masterGain);
-  bgMusicEl.play().catch(()=>{});
-  fadeGain(chatterGain,0,VOL.chatterNormal,4000);
-  fadeGain(bgMusicGain,0,VOL.bgNormal,4000);
+  // Museum ambience — constant background atmosphere
+  ambienceEl=new Audio('https://res.cloudinary.com/dzgabvxwv/raw/upload/audio/ambience.mp3');
+  ambienceEl.loop=true;
+  ambienceEl.setAttribute('playsinline','');
+  ambienceEl.setAttribute('webkit-playsinline','');
+  const ambiSrc=audioCtx.createMediaElementSource(ambienceEl);
+  ambienceGain=audioCtx.createGain();ambienceGain.gain.value=0;
+  ambiSrc.connect(ambienceGain);ambienceGain.connect(masterGain);
+  ambienceEl.play().catch(()=>{});
+  fadeGain(ambienceGain,0,0.55,4000);
+  fadeGain(chatterGain,0,0.15,4000);
   startChatter();
 }
 function fadeGain(node,from,to,durationMs){
-  if(!node)return;const now=audioCtx.currentTime;
+  if(!node||!audioCtx)return;const now=audioCtx.currentTime;
   node.gain.cancelScheduledValues(now);node.gain.setValueAtTime(from,now);
   node.gain.linearRampToValueAtTime(to,now+durationMs/1000);
 }
-function duckAudio(){if(!audioCtx)return;fadeGain(chatterGain,chatterGain.gain.value,VOL.chatterDucked,600);fadeGain(bgMusicGain,bgMusicGain.gain.value,VOL.bgDucked,600);}
+function duckAudio(){
+  if(!audioCtx)return;
+  fadeGain(chatterGain,chatterGain.gain.value,0.02,600);
+  if(ambienceGain)fadeGain(ambienceGain,ambienceGain.gain.value,0.08,600);
+}
 function restoreAudio(){
   if(!audioCtx)return;
-  fadeGain(chatterGain,chatterGain.gain.value,VOL.chatterNormal,1200);
-  fadeGain(bgMusicGain,bgMusicGain.gain.value,VOL.bgNormal,1200);
-  // Ensure bg music is actually playing (iOS can pause it)
-  if(bgMusicEl&&bgMusicEl.paused){bgMusicEl.play().catch(()=>{});}
+  fadeGain(chatterGain,chatterGain.gain.value,0.15,1200);
+  if(ambienceGain)fadeGain(ambienceGain,ambienceGain.gain.value,0.55,1200);
+  if(ambienceEl&&ambienceEl.paused)ambienceEl.play().catch(()=>{});
 }
 
 function makeVoiceBurst(){
@@ -1306,14 +1323,7 @@ function turnOnLights(){
   document.getElementById('archive-btn').style.display='flex';
   auraRing.visible=false;switchSpot.intensity=0;
   targetLookAt.set(0,1.5,0);
-  // Resume AudioContext if it was suspended (iOS behaviour)
-  if(audioCtx&&audioCtx.state==='suspended'){
-    audioCtx.resume().then(()=>{
-      if(bgMusicEl&&bgMusicEl.paused)bgMusicEl.play().catch(()=>{});
-    });
-  } else {
-    initAudio();
-  }
+  initAudio();
   scheduleNextLetter();
 }
 
@@ -1364,21 +1374,11 @@ function openMemory(mem){
   document.getElementById('memory-caption').textContent=mem.caption;
   photo.innerHTML='';photo.style.fontSize='';
   if(mem.video){
-    const v=document.createElement('video');
-    v.src=mem.video;v.controls=true;
-    v.setAttribute('playsinline','');
-    v.setAttribute('webkit-playsinline','');
-    v.setAttribute('x5-playsinline','');
-    v.preload='auto';
-    // On iOS, autoplay only works muted; user can unmute via controls
-    v.muted=false;
-    photo.appendChild(v);
-    // Attempt play; if blocked, the controls let user tap play
-    v.play().catch(()=>{});
+    const v=document.createElement('video');v.src=mem.video;v.controls=true;v.playsInline=true;
+    v.setAttribute('playsinline','');v.setAttribute('webkit-playsinline','');
+    photo.appendChild(v);v.play().catch(()=>{});
   } else if(mem.photo){
-    const img=document.createElement('img');img.alt='';img.src=mem.photo;
-    img.style.width='100%';img.style.height='100%';img.style.objectFit='cover';
-    photo.appendChild(img);
+    const img=document.createElement('img');img.alt='';img.src=mem.photo;photo.appendChild(img);
   } else {photo.textContent=mem.emoji||'📸';photo.style.fontSize='3.5rem';}
   document.getElementById('memory-panel').classList.add('open');syncModalLayer();
 }
@@ -1433,16 +1433,16 @@ function openMilestone(i){
 
 // All letter videos. Add more by continuing the pattern.
 const LETTER_VIDEOS = [
-  'media/video1.mp4',
-  'media/video2.mp4',
-  'media/video3.mp4',
-  'media/video4.mp4',
-  'media/video5.mp4',
-  'media/video6.mp4',
-  'media/video7.mp4',
-  'media/video8.mp4',
-  'media/video9.mp4',
-  'media/video10.mp4',
+  'https://res.cloudinary.com/dzgabvxwv/video/upload/media/video1.mp4',
+  'https://res.cloudinary.com/dzgabvxwv/video/upload/media/video2.mp4',
+  'https://res.cloudinary.com/dzgabvxwv/video/upload/media/video3.mp4',
+  'https://res.cloudinary.com/dzgabvxwv/video/upload/media/video4.mp4',
+  'https://res.cloudinary.com/dzgabvxwv/video/upload/media/video5.mp4',
+  'https://res.cloudinary.com/dzgabvxwv/video/upload/media/video6.mp4',
+  'https://res.cloudinary.com/dzgabvxwv/video/upload/media/video7.mp4',
+  'https://res.cloudinary.com/dzgabvxwv/video/upload/media/video8.mp4',
+  'https://res.cloudinary.com/dzgabvxwv/video/upload/media/video9.mp4',
+  'https://res.cloudinary.com/dzgabvxwv/video/upload/media/video10.mp4',
 ];
 
 // Groups that should never play back-to-back with themselves
@@ -1604,8 +1604,6 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 // ═══════════════════════════════════════
 let doorOpen=false;
 function enterMuseum(){
-  // Trigger audio init here — this IS the user gesture on mobile
-  initAudio();
   document.getElementById('landing').classList.add('fade-out');
   setTimeout(()=>{
     document.getElementById('landing').style.display='none';
