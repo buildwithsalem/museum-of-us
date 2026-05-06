@@ -245,8 +245,8 @@
       flex-shrink: 0;
       max-height: 55dvh;
     }
-    .memory-photo img { width: 100%; height: 100%; object-fit: cover; }
-    .memory-photo video { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .memory-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .memory-photo video { width: 100%; height: 100%; object-fit: contain; display: block; background: #000; }
 
     .memory-body { padding: 1.8rem 2rem 2rem; overflow-y: auto; }
 
@@ -1072,10 +1072,11 @@ aprPlaqueMesh.position.set(0,-1.05,0.04); aprGrp.add(aprPlaqueMesh);
 loadWallVideoIntoFrame(aprGrp, aprMem);  // now just shows emoji placeholder
 scene.add(aprGrp); clickableFrames.push(aprGrp);
 
-// Timeline plaque — centered on left wall for easy discovery
+// Timeline plaque — mounted on the FRONT WALL (right side of entry), away from all frames
 const timelineGrp=new THREE.Group();
-timelineGrp.position.set(LEFT_X, FRAME_ROW_Y+.06, 0);  // centered on left wall
-timelineGrp.rotation.y = Math.PI/2;
+// Front wall is at z = D/2. Place plaque on the inside face of front wall, right of door
+timelineGrp.position.set(W/2-1.8, FRAME_ROW_Y+.06, D/2-.07);
+timelineGrp.rotation.y = Math.PI;  // face inward (toward room)
 timelineGrp.userData.isTimeline=true;
 const tPlaque=new THREE.Mesh(new THREE.BoxGeometry(2.45,2.05,.07),goldMat); timelineGrp.add(tPlaque);
 const tInner=new THREE.Mesh(new THREE.BoxGeometry(2.24,1.84,.05),new THREE.MeshStandardMaterial({color:0x08070e}));
@@ -1134,8 +1135,8 @@ framePositions.forEach(({pos})=>{
   scene.add(s);scene.add(s.target);frameSpots.push(s);
 });
 const timelineSpot=new THREE.SpotLight(0xfff1d8,0,14,Math.PI/6,.38,1.95);
-timelineSpot.position.set(LEFT_X+3, H-.42, 0);
-timelineSpot.target.position.set(LEFT_X, FRAME_ROW_Y, 0);
+timelineSpot.position.set(W/2-1.8, H-.42, D/2-3);
+timelineSpot.target.position.set(W/2-1.8, FRAME_ROW_Y, D/2-.07);
 scene.add(timelineSpot);scene.add(timelineSpot.target);frameSpots.push(timelineSpot);
 // Dramatic spotlight on the featured apr.MOV center frame
 const aprSpot=new THREE.SpotLight(0xfff5d0,0,7,Math.PI/5,.3,1.8);
@@ -1151,9 +1152,13 @@ const VOL={chatterNormal:.15,chatterDucked:.03,bgNormal:.4,bgDucked:.1};
 function initAudio(){
   if(audioCtx)return;
   audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  // iOS: resume context immediately since we're inside a user gesture
+  if(audioCtx.state==='suspended')audioCtx.resume();
   masterGain=audioCtx.createGain();masterGain.gain.value=1;masterGain.connect(audioCtx.destination);
   chatterGain=audioCtx.createGain();chatterGain.gain.value=0;chatterGain.connect(masterGain);
   bgMusicEl=new Audio('audio/adura.mp3');bgMusicEl.loop=true;
+  bgMusicEl.setAttribute('playsinline','');
+  bgMusicEl.setAttribute('webkit-playsinline','');
   const src=audioCtx.createMediaElementSource(bgMusicEl);
   bgMusicGain=audioCtx.createGain();bgMusicGain.gain.value=0;src.connect(bgMusicGain);bgMusicGain.connect(masterGain);
   bgMusicEl.play().catch(()=>{});
@@ -1301,7 +1306,14 @@ function turnOnLights(){
   document.getElementById('archive-btn').style.display='flex';
   auraRing.visible=false;switchSpot.intensity=0;
   targetLookAt.set(0,1.5,0);
-  initAudio();
+  // Resume AudioContext if it was suspended (iOS behaviour)
+  if(audioCtx&&audioCtx.state==='suspended'){
+    audioCtx.resume().then(()=>{
+      if(bgMusicEl&&bgMusicEl.paused)bgMusicEl.play().catch(()=>{});
+    });
+  } else {
+    initAudio();
+  }
   scheduleNextLetter();
 }
 
@@ -1352,11 +1364,21 @@ function openMemory(mem){
   document.getElementById('memory-caption').textContent=mem.caption;
   photo.innerHTML='';photo.style.fontSize='';
   if(mem.video){
-    const v=document.createElement('video');v.src=mem.video;v.controls=true;v.playsInline=true;
-    v.setAttribute('playsinline','');v.setAttribute('webkit-playsinline','');
-    photo.appendChild(v);v.play().catch(()=>{});
+    const v=document.createElement('video');
+    v.src=mem.video;v.controls=true;
+    v.setAttribute('playsinline','');
+    v.setAttribute('webkit-playsinline','');
+    v.setAttribute('x5-playsinline','');
+    v.preload='auto';
+    // On iOS, autoplay only works muted; user can unmute via controls
+    v.muted=false;
+    photo.appendChild(v);
+    // Attempt play; if blocked, the controls let user tap play
+    v.play().catch(()=>{});
   } else if(mem.photo){
-    const img=document.createElement('img');img.alt='';img.src=mem.photo;photo.appendChild(img);
+    const img=document.createElement('img');img.alt='';img.src=mem.photo;
+    img.style.width='100%';img.style.height='100%';img.style.objectFit='cover';
+    photo.appendChild(img);
   } else {photo.textContent=mem.emoji||'📸';photo.style.fontSize='3.5rem';}
   document.getElementById('memory-panel').classList.add('open');syncModalLayer();
 }
@@ -1582,6 +1604,8 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 // ═══════════════════════════════════════
 let doorOpen=false;
 function enterMuseum(){
+  // Trigger audio init here — this IS the user gesture on mobile
+  initAudio();
   document.getElementById('landing').classList.add('fade-out');
   setTimeout(()=>{
     document.getElementById('landing').style.display='none';
