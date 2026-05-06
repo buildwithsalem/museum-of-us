@@ -602,7 +602,7 @@
 <div id="video-overlay">
   <div class="video-frame">
     <video id="letter-video" playsinline webkit-playsinline preload="auto" controls>
-      <source src="https://res.cloudinary.com/dzgabvxwv/video/upload/v1778098432/media/apr.MOV" type="video/quicktime">
+      <source src="https://res.cloudinary.com/dzgabvxwv/video/upload/v1778097963/apr.mov" type="video/quicktime">
     </video>
     <div class="video-placeholder" id="video-placeholder" style="display:none">
       <div class="play-icon">▶</div>
@@ -729,13 +729,13 @@
 // ── Populate this list with your 70 landing photos ──
 // Format: 'landing/yourfilename.jpg'
 // We pre-populate 70 slots; add real filenames as you add photos.
-const LANDING_PHOTOS_70 = Array.from({length:70}, (_,i) => `https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098432/landing/${String(i+1).padStart(3,'0')}.jpg`);
+const LANDING_PHOTOS_70 = Array.from({length:70}, (_,i) => `https://res.cloudinary.com/dzgabvxwv/image/upload/v1778099322/landing/${String(i+1).padStart(3,'0')}.jpg`);
 
 // Fallback to museum photos if landing/ folder isn't set up yet
 const LANDING_PHOTOS_FALLBACK = [
-  'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098432/media/first_pic.png','https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098432/media/sept.png','https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098432/media/oct.png','https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098432/media/nov.png',
-  'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098432/media/dec.png','https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098432/media/jan.png','https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098432/media/feb.png','https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098432/media/mar.png',
-  'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098432/media/first_actual.JPG','https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098432/media/imnotsleepy.png',
+  'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778097959/first_pic.png','https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098428/sept.jpg','https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098430/oct.jpg','https://res.cloudinary.com/dzgabvxwv/image/upload/v1778097962/nov.jpg',
+  'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098429/dec.jpg','https://res.cloudinary.com/dzgabvxwv/image/upload/v1778097960/jan.jpg','https://res.cloudinary.com/dzgabvxwv/image/upload/v1778097958/feb.jpg','https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098427/mar.jpg',
+  'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778097959/first_actual.jpg','https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098432/imnotsleepy.jpg',
 ];
 
 (function initLandingSmack() {
@@ -841,17 +841,17 @@ const state = {
 };
 
 const memories = [
-  { id:'frame1',  date:'The First One',   caption:'"The night I knew I wanted to collect every moment with you."',       emoji:'🌙',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098432/media/first_actual.JPG', audio:'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778099330/ambience.mp3' },
-  { id:'frame2',  date:'September',       caption:'"Every ordinary moment with you becomes extraordinary."',              emoji:'🌅',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098432/media/sept.png' },
-  { id:'frame3',  date:'October',         caption:'"You make every season feel like the best one."',                     emoji:'🍂',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098432/media/oct.png' },
-  { id:'frame4',  date:'November',        caption:'"Grateful. For you, always."',                                        emoji:'🍁',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098432/media/nov.png' },
-  { id:'frame5',  date:'December',        caption:'"The lights, the cold, you. I wanted time to stop."',                emoji:'❄️',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098432/media/dec.png' },
-  { id:'frame6',  date:'January',         caption:'"A new year, but the same feeling. You."',                          emoji:'✨',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098432/media/jan.png' },
-  { id:'frame7',  date:'February',        caption:'"Every day feels like the one made for us."',                         emoji:'💛',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098432/media/feb.png' },
-  { id:'frame8',  date:'March',           caption:'"Watching us grow. Still my favorite thing to witness."',             emoji:'🌸',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098432/media/mar.png' },
-  { id:'frame9',  date:'Sleeping Beauty', caption:'"I am not sleepy, I am not sleepy. Look at you 😒"',                 emoji:'🌙',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098432/v1778098432/imnotsleepy.jpg', isHM:true },
-  { id:'frameAPR',date:'Strong JoJo',   caption:'"This one lives on the wall too 💌"', emoji:'🎬', video:'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778098432/media/apr.MOV', videoMuted:false, photoFit:'natural' },
-  { id:'frameX',  date:'One more still',  caption:'"Another moment worth hanging in our gallery."',                      emoji:'💕',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098432/media/first_pic.png' },
+  { id:'frame1',  date:'The First One',   caption:'"The night I knew I wanted to collect every moment with you."',       emoji:'🌙',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778097959/first_actual.jpg', audio:'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778098432/v1778099330/ambience.mp3' },
+  { id:'frame2',  date:'September',       caption:'"Every ordinary moment with you becomes extraordinary."',              emoji:'🌅',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098428/sept.jpg' },
+  { id:'frame3',  date:'October',         caption:'"You make every season feel like the best one."',                     emoji:'🍂',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098430/oct.jpg' },
+  { id:'frame4',  date:'November',        caption:'"Grateful. For you, always."',                                        emoji:'🍁',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778097962/nov.jpg' },
+  { id:'frame5',  date:'December',        caption:'"The lights, the cold, you. I wanted time to stop."',                emoji:'❄️',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098429/dec.jpg' },
+  { id:'frame6',  date:'January',         caption:'"A new year, but the same feeling. You."',                          emoji:'✨',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778097960/jan.jpg' },
+  { id:'frame7',  date:'February',        caption:'"Every day feels like the one made for us."',                         emoji:'💛',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778097958/feb.jpg' },
+  { id:'frame8',  date:'March',           caption:'"Watching us grow. Still my favorite thing to witness."',             emoji:'🌸',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098427/mar.jpg' },
+  { id:'frame9',  date:'Sleeping Beauty', caption:'"I am not sleepy, I am not sleepy. Look at you 😒"',                 emoji:'🌙',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098432/imnotsleepy.jpg', isHM:true },
+  { id:'frameAPR',date:'Strong JoJo',   caption:'"This one lives on the wall too 💌"', emoji:'🎬', video:'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778097963/apr.mov', videoMuted:false, photoFit:'natural' },
+  { id:'frameX',  date:'One more still',  caption:'"Another moment worth hanging in our gallery."',                      emoji:'💕',  photo:'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778097959/first_pic.png' },
   { id:'timeline',date:'Our Journey',     caption:'"Every chapter written together."', emoji:'📖', isTimeline:true },
 ];
 
@@ -1433,16 +1433,16 @@ function openMilestone(i){
 
 // All letter videos. Add more by continuing the pattern.
 const LETTER_VIDEOS = [
-  'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778098432/media/video1.mp4',
-  'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778098432/media/video2.mp4',
-  'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778098432/media/video3.mp4',
-  'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778098432/media/video4.mp4',
-  'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778098432/media/video5.mp4',
-  'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778098432/media/video6.mp4',
-  'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778098432/media/video7.mp4',
-  'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778098432/media/video8.mp4',
-  'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778098432/media/video9.mp4',
-  'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778098432/media/video10.mp4',
+  'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778097973/video1.mov',
+  'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778097976/video2.mov',
+  'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778097965/video3.mov',
+  'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778097974/video4.mov',
+  'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778097979/video5.mov',
+  'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778098122/video6.mov',
+  'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778097978/video7.mov',
+  'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778097971/video8.mov',
+  'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778097975/video9.mov',
+  'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778097981/video10.mov',
 ];
 
 // Groups that should never play back-to-back with themselves
