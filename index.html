@@ -171,7 +171,7 @@
     #hud {
       position: fixed; top: 1.5rem; left: 50%;
       transform: translateX(-50%); z-index: 30;
-      font-family: 'Cinzel', serif; font-size: 0.35rem;
+      font-family: 'Cinzel', serif; font-size: 0.65rem;
       letter-spacing: 0.4em; color: rgba(201,168,76,0.45);
       text-transform: uppercase; pointer-events: none;
       opacity: 0; transition: opacity 1s ease 1.5s;
@@ -541,6 +541,68 @@
       #toast { bottom: calc(1rem + env(safe-area-inset-bottom)); }
     }
 
+    /* ─ ARCHIVE TABS ─ */
+    .archive-tabs {
+      display: flex; border-bottom: 1px solid rgba(201,168,76,0.12);
+      flex-shrink: 0;
+    }
+    .archive-tab {
+      flex: 1; padding: 0.75rem 0.5rem;
+      font-family: 'Cinzel', serif; font-size: 0.6rem;
+      letter-spacing: 0.3em; text-transform: uppercase;
+      color: rgba(201,168,76,0.45); background: none; border: none;
+      cursor: pointer; transition: color 0.2s, border-color 0.2s;
+      border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .archive-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+    /* ─ EXIT GATE MODAL ─ */
+    #exit-gate {
+      position: fixed; inset: 0; z-index: 85;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+    }
+    #exit-gate.open { opacity: 1; pointer-events: all; }
+    .exit-gate-card {
+      background: var(--panel);
+      border: 1px solid rgba(201,168,76,0.25);
+      max-width: 420px; width: 90%;
+      padding: 2.5rem 2rem 2rem;
+      text-align: center;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.85);
+      position: relative;
+    }
+    .exit-gate-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+    .exit-gate-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; font-style: italic;
+      color: var(--cream); margin-bottom: 1rem;
+    }
+    .exit-gate-body {
+      font-style: italic; color: rgba(240,230,211,0.65);
+      font-size: 0.95rem; line-height: 1.7; margin-bottom: 1.8rem;
+    }
+    .exit-gate-body strong { color: var(--gold); font-style: normal; }
+    .exit-gate-btns { display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap; }
+    .exit-gate-btn {
+      font-family: 'Cinzel', serif; font-size: 0.62rem;
+      letter-spacing: 0.35em; text-transform: uppercase;
+      padding: 0.75rem 1.6rem; cursor: pointer;
+      transition: all 0.2s; border-radius: 2px;
+    }
+    .exit-gate-btn.primary {
+      background: linear-gradient(135deg,var(--gold2),var(--gold));
+      color: var(--dark); border: none;
+    }
+    .exit-gate-btn.secondary {
+      background: none; color: rgba(201,168,76,0.6);
+      border: 1px solid rgba(201,168,76,0.3);
+    }
+    .exit-gate-btn:hover { opacity: 0.85; }
+
     ::-webkit-scrollbar { width: 3px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.2); border-radius: 2px; }
@@ -564,7 +626,7 @@
     <div class="landing-eyebrow">A Private Exhibition</div>
     <div class="landing-title">Museum<br>of Us</div>
     <div class="landing-rule"></div>
-    <div class="landing-sub">may 2025 — may 2026</div>
+    <div class="landing-sub">april 2025 — april 2026</div>
     <button class="enter-btn" onclick="enterMuseum()">Enter the Gallery</button>
   </div>
 </div>
@@ -573,7 +635,7 @@
 <div id="canvas-container"><canvas id="three-canvas"></canvas></div>
 
 <!-- HUD -->
-<div id="hud">Museum of Us • Explore Freely</div>
+<div id="hud">Museum of Us &nbsp;·&nbsp; Explore Freely</div>
 
 <!-- SWITCH HINT -->
 <div id="switch-hint"><span class="arrow">←</span><span id="hint-text">Find the light switch to begin</span></div>
@@ -695,6 +757,10 @@
     <div class="archive-eyebrow">Your Messages</div>
     <div class="archive-title-text">Archive</div>
   </div>
+  <div class="archive-tabs">
+    <button class="archive-tab active" id="archive-tab-pending" onclick="switchArchiveTab('pending')">Missed & Unfinished</button>
+    <button class="archive-tab" id="archive-tab-viewed" onclick="switchArchiveTab('viewed')">Viewed 💝</button>
+  </div>
   <div class="archive-scroll">
     <div id="archive-list">
       <div class="archive-empty">No messages yet.<br><br>Keep exploring the gallery...</div>
@@ -702,10 +768,26 @@
   </div>
 </div>
 
+<!-- EXIT GATE -->
+<div id="exit-gate">
+  <div class="exit-gate-card">
+    <div class="exit-gate-title">Wait — there are letters for you 💌</div>
+    <div class="exit-gate-body">
+      You have <strong id="exit-gate-unseen">0</strong> unseen letter(s) and
+      <strong id="exit-gate-missed">0</strong> missed/unfinished letter(s) still waiting.<br><br>
+      She wrote these just for you. Stay a little longer?
+    </div>
+    <div class="exit-gate-btns">
+      <button class="exit-gate-btn primary" onclick="exitGateOpenArchive()">View My Letters 📬</button>
+      <button class="exit-gate-btn secondary" onclick="closeExitGate()">Keep Exploring</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 
-/*// ═══════════════════════════════════════
+// ═══════════════════════════════════════
 //  LANDING PHOTO RAIN
 //  Photos pop in at random positions, sizes, and rotations.
 //  Some overlap — that's intentional, like a scattered gallery wall.
@@ -729,7 +811,7 @@
 // ── Populate this list with your 70 landing photos ──
 // Format: 'landing/yourfilename.jpg'
 // We pre-populate 70 slots; add real filenames as you add photos.
-const LANDING_PHOTOS_70 = Array.from({length:70}, (_,i) => `https://res.cloudinary.com/dzgabvxwv/image/upload/v1778099322/landing/${String(i+1).padStart(3,'0')}.jpg`);
+const LANDING_PHOTOS_70 = Array.from({length:70}, (_,i) => `landing/${String(i+1).padStart(3,'0')}.jpg`);
 
 // Fallback to museum photos if landing/ folder isn't set up yet
 const LANDING_PHOTOS_FALLBACK = [
@@ -829,7 +911,7 @@ const LANDING_PHOTOS_FALLBACK = [
     }
   }
 })();
-*/
+
 
 // ═══════════════════════════════════════
 //  STATE + DATA
@@ -1072,21 +1154,34 @@ aprPlaqueMesh.position.set(0,-1.05,0.04); aprGrp.add(aprPlaqueMesh);
 loadWallVideoIntoFrame(aprGrp, aprMem);  // now just shows emoji placeholder
 scene.add(aprGrp); clickableFrames.push(aprGrp);
 
-// Timeline plaque — centered on left wall for easy discovery
+// Timeline — freestanding pedestal CENTER of room. Overlaps nothing.
 const timelineGrp=new THREE.Group();
-timelineGrp.position.set(LEFT_X, FRAME_ROW_Y+.06, 0);  // centered on left wall
-timelineGrp.rotation.y = Math.PI/2;
+timelineGrp.position.set(0,0,0);
 timelineGrp.userData.isTimeline=true;
-const tPlaque=new THREE.Mesh(new THREE.BoxGeometry(2.45,2.05,.07),goldMat); timelineGrp.add(tPlaque);
-const tInner=new THREE.Mesh(new THREE.BoxGeometry(2.24,1.84,.05),new THREE.MeshStandardMaterial({color:0x08070e}));
-tInner.position.z=.02; timelineGrp.add(tInner);
+// Pedestal base column
+const pedBase=new THREE.Mesh(new THREE.BoxGeometry(1.0,1.0,1.0),new THREE.MeshStandardMaterial({color:0x1a1525,roughness:0.7,metalness:0.2}));
+pedBase.position.set(0,0.5,0); timelineGrp.add(pedBase);
+// Gold cap
+const pedCap=new THREE.Mesh(new THREE.BoxGeometry(1.08,0.06,1.08),goldMat);
+pedCap.position.set(0,1.03,0); timelineGrp.add(pedCap);
+// Gold frame behind plaque
+const tFrame=new THREE.Mesh(new THREE.BoxGeometry(1.0,1.1,0.04),goldMat);
+tFrame.position.set(0,1.62,0); timelineGrp.add(tFrame);
+// Dark plaque panel
+const tPanel=new THREE.Mesh(new THREE.BoxGeometry(0.92,1.02,0.05),new THREE.MeshStandardMaterial({color:0x0e0d14,roughness:0.85}));
+tPanel.position.set(0,1.62,0.02); timelineGrp.add(tPanel);
+// Canvas texture
 const tLabel=document.createElement('canvas'); tLabel.width=512; tLabel.height=360;
 const tlctx=tLabel.getContext('2d');
-tlctx.fillStyle='#c9a84c'; tlctx.font='italic 34px serif'; tlctx.textAlign='center'; tlctx.fillText('Our Story',256,56);
-tlctx.font='20px serif'; tlctx.fillStyle='rgba(240,230,211,0.7)'; tlctx.fillText('Tap to open our timeline →',256,116);
+tlctx.fillStyle='#c9a84c'; tlctx.font='italic 36px serif'; tlctx.textAlign='center';
+tlctx.fillText('Our Story',256,60);
+tlctx.font='18px serif'; tlctx.fillStyle='rgba(240,230,211,0.75)';
+tlctx.fillText('Tap to open our timeline',256,110);
+tlctx.font='30px serif'; tlctx.fillText('📖',256,170);
 const tTex=new THREE.CanvasTexture(tLabel); tTex.needsUpdate=true;
-const tMesh=new THREE.Mesh(new THREE.PlaneGeometry(2.06,1.68),new THREE.MeshBasicMaterial({map:tTex,transparent:true}));
-tMesh.position.z=.05; timelineGrp.add(tMesh); scene.add(timelineGrp);
+const tMesh=new THREE.Mesh(new THREE.PlaneGeometry(0.86,0.94),new THREE.MeshBasicMaterial({map:tTex,transparent:true}));
+tMesh.position.set(0,1.62,0.05); timelineGrp.add(tMesh);
+scene.add(timelineGrp);
 
 // Light switch
 const switchGrp=new THREE.Group();
@@ -1133,9 +1228,9 @@ framePositions.forEach(({pos})=>{
   s.position.set(pos[0],pos[1]+1.55,pos[2]+1.55);s.target.position.set(...pos);
   scene.add(s);scene.add(s.target);frameSpots.push(s);
 });
-const timelineSpot=new THREE.SpotLight(0xfff1d8,0,14,Math.PI/6,.38,1.95);
-timelineSpot.position.set(LEFT_X+3, H-.42, 0);
-timelineSpot.target.position.set(LEFT_X, FRAME_ROW_Y, 0);
+const timelineSpot=new THREE.SpotLight(0xfff1d8,0,8,Math.PI/7,.35,1.8);
+timelineSpot.position.set(0,H-.3,0);
+timelineSpot.target.position.set(0,1.0,0);
 scene.add(timelineSpot);scene.add(timelineSpot.target);frameSpots.push(timelineSpot);
 // Dramatic spotlight on the featured apr.MOV center frame
 const aprSpot=new THREE.SpotLight(0xfff5d0,0,7,Math.PI/5,.3,1.8);
@@ -1143,11 +1238,11 @@ aprSpot.position.set(0,H-.3,BACK_Z+3.5);aprSpot.target.position.set(0,FRAME_ROW_
 scene.add(aprSpot);scene.add(aprSpot.target);frameSpots.push(aprSpot);
 
 // ═══════════════════════════════════════
-//  AUDIO — Ambience loop + Spotify playlist (hidden)
+//  AUDIO — Ambience loop + Spotify playlist (hidden) + chatter
 // ═══════════════════════════════════════
-let audioCtx=null,masterGain=null,chatterGain=null,ambienceEl=null,ambienceGain=null;
+let audioCtx=null,masterGain=null,chatterGain=null,ambienceEl=null;
 
-// Inject hidden Spotify embed once — user gesture unlocks autoplay
+// Inject hidden Spotify embed once on user gesture
 let spotifyInjected=false;
 function injectSpotify(){
   if(spotifyInjected)return;
@@ -1163,38 +1258,55 @@ function injectSpotify(){
 function initAudio(){
   if(audioCtx)return;
   injectSpotify();
+
+  // Ambience — play directly via HTMLAudioElement (no WebAudio routing = no crackling on mobile)
+  ambienceEl=new Audio('https://res.cloudinary.com/dzgabvxwv/video/upload/v1778099330/ambience.mp3');
+  ambienceEl.loop=true;
+  ambienceEl.volume=0;
+  ambienceEl.setAttribute('playsinline','');
+  ambienceEl.setAttribute('webkit-playsinline','');
+  ambienceEl.play().catch(()=>{});
+  // Fade volume in gradually over 4s using setInterval (no WebAudio needed)
+  let vol=0;
+  const fadeIn=setInterval(()=>{
+    vol=Math.min(0.55,vol+0.55/40);
+    ambienceEl.volume=vol;
+    if(vol>=0.55)clearInterval(fadeIn);
+  },100);
+
+  // WebAudio only for the procedural chatter synth (no media element = no crackling)
   audioCtx=new(window.AudioContext||window.webkitAudioContext)();
   if(audioCtx.state==='suspended')audioCtx.resume();
   masterGain=audioCtx.createGain();masterGain.gain.value=1;masterGain.connect(audioCtx.destination);
   chatterGain=audioCtx.createGain();chatterGain.gain.value=0;chatterGain.connect(masterGain);
-  // Museum ambience — constant background atmosphere
-  ambienceEl=new Audio('https://res.cloudinary.com/dzgabvxwv/video/upload/v1778099330/ambience.mp3');
-  ambienceEl.loop=true;
-  ambienceEl.setAttribute('playsinline','');
-  ambienceEl.setAttribute('webkit-playsinline','');
-  const ambiSrc=audioCtx.createMediaElementSource(ambienceEl);
-  ambienceGain=audioCtx.createGain();ambienceGain.gain.value=0;
-  ambiSrc.connect(ambienceGain);ambienceGain.connect(masterGain);
-  ambienceEl.play().catch(()=>{});
-  fadeGain(ambienceGain,0,0.55,4000);
   fadeGain(chatterGain,0,0.15,4000);
   startChatter();
 }
+
 function fadeGain(node,from,to,durationMs){
-  if(!node||!audioCtx)return;const now=audioCtx.currentTime;
-  node.gain.cancelScheduledValues(now);node.gain.setValueAtTime(from,now);
+  if(!node||!audioCtx)return;
+  const now=audioCtx.currentTime;
+  node.gain.cancelScheduledValues(now);
+  node.gain.setValueAtTime(from,now);
   node.gain.linearRampToValueAtTime(to,now+durationMs/1000);
 }
+
 function duckAudio(){
-  if(!audioCtx)return;
-  fadeGain(chatterGain,chatterGain.gain.value,0.02,600);
-  if(ambienceGain)fadeGain(ambienceGain,ambienceGain.gain.value,0.08,600);
+  if(ambienceEl) ambienceEl.volume=0.06;
+  if(chatterGain&&audioCtx) fadeGain(chatterGain,chatterGain.gain.value,0.02,600);
 }
 function restoreAudio(){
-  if(!audioCtx)return;
-  fadeGain(chatterGain,chatterGain.gain.value,0.15,1200);
-  if(ambienceGain)fadeGain(ambienceGain,ambienceGain.gain.value,0.55,1200);
-  if(ambienceEl&&ambienceEl.paused)ambienceEl.play().catch(()=>{});
+  if(ambienceEl){
+    ambienceEl.volume=0.06;
+    let vol=0.06;
+    const fadeUp=setInterval(()=>{
+      vol=Math.min(0.55,vol+0.015);
+      ambienceEl.volume=vol;
+      if(vol>=0.55)clearInterval(fadeUp);
+    },80);
+    if(ambienceEl.paused)ambienceEl.play().catch(()=>{});
+  }
+  if(chatterGain&&audioCtx) fadeGain(chatterGain,chatterGain.gain.value,0.15,1200);
 }
 
 function makeVoiceBurst(){
@@ -1319,11 +1431,15 @@ function turnOnLights(){
   document.getElementById('switch-hint').classList.remove('visible');
   document.getElementById('hud').classList.add('visible');
   if(window.matchMedia('(pointer: coarse)').matches)document.getElementById('mobile-controls').classList.add('visible');
-  // Show archive button as soon as museum opens — letters will arrive shortly
   document.getElementById('archive-btn').style.display='flex';
   auraRing.visible=false;switchSpot.intensity=0;
   targetLookAt.set(0,1.5,0);
-  initAudio();
+  // Resume if suspended (iOS sometimes suspends between gestures), else init fresh
+  if(audioCtx && audioCtx.state==='suspended'){
+    audioCtx.resume().then(()=>{ if(ambienceEl&&ambienceEl.paused) ambienceEl.play().catch(()=>{}); });
+  } else if(!audioCtx){
+    initAudio();
+  }
   scheduleNextLetter();
 }
 
@@ -1345,7 +1461,7 @@ function updateLights(dt){
 }
 
 function syncModalLayer(){
-  const anyOpen=['memory-panel','timeline-panel','archive-panel','video-overlay'].some(id=>document.getElementById(id).classList.contains('open'));
+  const anyOpen=['memory-panel','timeline-panel','archive-panel','video-overlay','exit-gate'].some(id=>document.getElementById(id)?.classList.contains('open'));
   document.getElementById('dark-overlay').classList.toggle('active',anyOpen);
   const showWalk=state.lightsOn&&window.matchMedia('(pointer: coarse)').matches&&!anyOpen;
   document.getElementById('mobile-controls').classList.toggle('visible',showWalk);
@@ -1428,10 +1544,16 @@ function openMilestone(i){
 }
 
 // ═══════════════════════════════════════
-//  FLOATING LETTER + SMART VIDEO PICKER
+//  FLOATING LETTER + VIDEO SYSTEM
+//  Rules:
+//  - Each video plays at most once ever (no repeats)
+//  - Missed letter → stored in archive with its assigned video
+//  - Closing early → stored as "not finished", replayable once
+//  - All letters viewed → no more letters appear
+//  - Exit attempt before all viewed → gate modal shows remaining
+//  - Archive has two tabs: Missed/Unfinished | Viewed
 // ═══════════════════════════════════════
 
-// All letter videos. Add more by continuing the pattern.
 const LETTER_VIDEOS = [
   'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778097973/video1.mov',
   'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778097976/video2.mov',
@@ -1445,149 +1567,230 @@ const LETTER_VIDEOS = [
   'https://res.cloudinary.com/dzgabvxwv/video/upload/v1778097981/video10.mov',
 ];
 
-// Groups that should never play back-to-back with themselves
-// (any two videos in the same group won't follow each other)
-const LETTER_VIDEO_GROUPS = {
-  cluster: [3, 4, 5, 6, 7],   // video4–8 (0-indexed: indices 3–7)
-  special: [0, 8, 9],          // video1, video9, video10 (indices 0, 8, 9)
-};
+// Track each video's state: 'unseen' | 'missed' | 'unfinished' | 'viewed'
+const videoStates = LETTER_VIDEOS.map((src,i)=>({src, index:i, status:'unseen', time:null}));
 
-function getGroupOf(idx) {
-  if (LETTER_VIDEO_GROUPS.cluster.includes(idx)) return 'cluster';
-  if (LETTER_VIDEO_GROUPS.special.includes(idx)) return 'special';
-  return null; // video2, video3 — no group restriction
-}
+function getUnseenVideos(){ return videoStates.filter(v=>v.status==='unseen'); }
+function getMissedVideos(){ return videoStates.filter(v=>v.status==='missed'||v.status==='unfinished'); }
+function getViewedVideos(){ return videoStates.filter(v=>v.status==='viewed'); }
+function allLettersDone(){ return videoStates.every(v=>v.status==='viewed'); }
 
-let lastVideoIndex = -1;
-let lastVideoGroup = null;
+// Pick a random unseen video and assign it to the next letter
+let currentLetterVideo = null; // the videoState object currently being shown
 
-function pickNextVideo() {
-  const total = LETTER_VIDEOS.length;
-  let candidates = [];
-
-  for (let i = 0; i < total; i++) {
-    if (i === lastVideoIndex) continue;           // never repeat exact same video
-    const grp = getGroupOf(i);
-    if (grp && grp === lastVideoGroup) continue;  // no consecutive same-group videos
-    candidates.push(i);
-  }
-
-  // Fallback: if all filtered (unlikely), allow any except exact repeat
-  if (candidates.length === 0) {
-    candidates = [...Array(total).keys()].filter(i => i !== lastVideoIndex);
-  }
-
-  const chosen = candidates[Math.floor(Math.random() * candidates.length)];
-  lastVideoIndex = chosen;
-  lastVideoGroup = getGroupOf(chosen);
-  return LETTER_VIDEOS[chosen];
+function pickNextUnseen(){
+  const pool = getUnseenVideos();
+  if(!pool.length) return null;
+  return pool[Math.floor(Math.random()*pool.length)];
 }
 
 let letterTimeout = null;
 function scheduleNextLetter(){
   if(letterTimeout) clearTimeout(letterTimeout);
-  letterTimeout = setTimeout(showLetter, 20000 + Math.random() * 40000);
+  if(allLettersDone()) return; // no more letters once all viewed
+  if(!getUnseenVideos().length) return;
+  letterTimeout = setTimeout(showLetter, 20000 + Math.random()*40000);
 }
+
 function showLetter(){
   if(state.letterVisible) return;
-  const anyOpen = ['memory-panel','timeline-panel','archive-panel','video-overlay']
-    .some(id => document.getElementById(id).classList.contains('open'));
-  if(anyOpen){ letterTimeout = setTimeout(showLetter, 8000); return; }
+  if(allLettersDone() || !getUnseenVideos().length) return;
+  const anyOpen = ['memory-panel','timeline-panel','archive-panel','video-overlay','exit-gate']
+    .some(id=>document.getElementById(id)?.classList.contains('open'));
+  if(anyOpen){ letterTimeout=setTimeout(showLetter,8000); return; }
+
+  // Assign this letter's video now (so missed knows which one it was)
+  currentLetterVideo = pickNextUnseen();
+  if(!currentLetterVideo) return;
+
   state.letterVisible = true;
   const el = document.getElementById('floating-letter');
-  el.style.left = (20 + Math.random() * 60) + 'vw';
-  el.style.top  = (20 + Math.random() * 40) + 'vh';
+  el.style.left = (20+Math.random()*60)+'vw';
+  el.style.top  = (20+Math.random()*40)+'vh';
   el.classList.add('visible');
-  setTimeout(()=>{ if(state.letterVisible && !state.letterPending) missedLetter(); }, 12000);
+
+  // Auto-miss after 12 seconds
+  setTimeout(()=>{ if(state.letterVisible) missedLetter(); }, 12000);
 }
+
 function clickLetter(){
   if(!state.letterVisible) return;
   state.letterVisible = false; state.letterPending = true;
   document.getElementById('floating-letter').classList.remove('visible');
-  openVideoLetter();
+  openVideoLetter(currentLetterVideo);
 }
+
 function missedLetter(){
+  if(!currentLetterVideo) return;
   state.letterVisible = false;
   document.getElementById('floating-letter').classList.remove('visible');
-  addToArchive(); showToast('You missed a floating letter 💌 — check your archive 📬');
+  currentLetterVideo.status = 'missed';
+  currentLetterVideo.time = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  updateArchiveBadge();
+  document.getElementById('archive-btn').style.display='flex';
+  showToast('You missed a floating letter 💌 — check your archive 📬');
+  currentLetterVideo = null;
   scheduleNextLetter();
 }
-function openVideoLetter(){
-  const src = pickNextVideo();
+
+function openVideoLetter(videoObj){
+  if(!videoObj) return;
   const video = document.getElementById('letter-video');
   const ph = document.getElementById('video-placeholder');
-
-  // Swap the source and reload
   video.pause();
-  const sourceEl = video.querySelector('source') || document.createElement('source');
-  sourceEl.src = src;
-  // Detect type from extension
-  sourceEl.type = src.endsWith('.mov') || src.endsWith('.MOV') ? 'video/quicktime' : 'video/mp4';
-  if(!video.contains(sourceEl)) video.appendChild(sourceEl);
+  // Set source directly (no <source> child swapping — cleaner on iOS)
+  video.src = videoObj.src;
   video.load();
-
-  video.style.display = 'block';
-  if(ph) ph.style.display = 'none';
-  video.currentTime = 0;
+  video.style.display='block';
+  if(ph) ph.style.display='none';
+  video.currentTime=0;
   video.play().catch(()=>{});
-
   document.getElementById('video-overlay').classList.add('open');
   syncModalLayer();
   duckAudio();
 }
+
 function closeVideo(){
   document.getElementById('video-overlay').classList.remove('open');
   const video = document.getElementById('letter-video');
-  const watchedEnough = video.duration && (video.currentTime >= video.duration - 3);
-  video.pause(); video.currentTime = 0;
-  if(state.letterPending){
+  const watchedEnough = video.duration && (video.currentTime >= video.duration*0.85);
+  video.pause(); video.currentTime=0; video.src='';
+
+  if(state.letterPending && currentLetterVideo){
     if(watchedEnough){
+      currentLetterVideo.status='viewed';
+      currentLetterVideo.time=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
       showToast('💌 Letter received — thank you for watching 🌹');
     } else {
-      showPendingEnvelope();
+      currentLetterVideo.status='unfinished';
+      currentLetterVideo.time=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+      showToast('You closed early ✉️ — it\'s saved in your archive to finish');
+      document.getElementById('archive-btn').style.display='flex';
     }
-    state.letterPending = false;
+    updateArchiveBadge();
+    state.letterPending=false;
+    currentLetterVideo=null;
   }
+
   syncModalLayer();
   restoreAudio();
-  scheduleNextLetter(); state.letterWatched = true;
+  scheduleNextLetter();
 }
-function showPendingEnvelope(){
-  document.getElementById('archive-btn').style.display='flex'; addToArchive('pending');
+
+function replayFromArchive(index){
+  const v = videoStates[index];
+  if(!v) return;
+  closeArchive();
+  currentLetterVideo = v;
+  state.letterPending = true;
+  openVideoLetter(v);
 }
+
+// ═══════════════════════════════════════
+//  EXIT GATE — intercept back/close before all letters viewed
+// ═══════════════════════════════════════
+function checkExitGate(){
+  if(allLettersDone()) return true; // let them go
+  const unseen = getUnseenVideos().length;
+  const missed = getMissedVideos().length;
+  showExitGate(unseen, missed);
+  return false;
+}
+
+function showExitGate(unseen, missed){
+  document.getElementById('exit-gate-unseen').textContent = unseen;
+  document.getElementById('exit-gate-missed').textContent = missed;
+  document.getElementById('exit-gate').classList.add('open');
+  syncModalLayer();
+  duckAudio();
+}
+function closeExitGate(){
+  document.getElementById('exit-gate').classList.remove('open');
+  syncModalLayer();
+  restoreAudio();
+}
+function exitGateOpenArchive(){
+  closeExitGate();
+  openArchive();
+}
+
+// Intercept browser back button / swipe-to-close
+window.addEventListener('popstate', e=>{
+  e.preventDefault();
+  if(state.entered && !allLettersDone()){
+    history.pushState(null,'',location.href);
+    checkExitGate();
+  }
+});
+// Push a dummy state so popstate fires on back
+window.addEventListener('load',()=>history.pushState(null,'',location.href));
 
 // ═══════════════════════════════════════
 //  ARCHIVE
 // ═══════════════════════════════════════
-function addToArchive(type='missed'){
-  state.archiveItems.push({
-    type,
-    label: type==='pending' ? 'Unfinished Letter' : 'Missed Letter',
-    desc:  type==='pending' ? 'You closed before finishing' : 'It floated away before you could catch it',
-    time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})
-  });
-  updateArchiveBadge();
-  document.getElementById('archive-btn').style.display='flex';
+let archiveTab = 'pending'; // 'pending' | 'viewed'
+
+function updateArchiveBadge(){
+  const b=document.getElementById('archive-badge');
+  const n=getMissedVideos().length;
+  b.textContent=n; b.style.display=n>0?'flex':'none';
 }
-function updateArchiveBadge(){const b=document.getElementById('archive-badge');const n=state.archiveItems.length;b.textContent=n;b.style.display=n>0?'flex':'none';}
+
 function openArchive(){
-  const list=document.getElementById('archive-list');
-  if(!state.archiveItems.length){
-    list.innerHTML='<div class="archive-empty">No missed messages yet.<br><br>Keep exploring — letters will float by as you wander the gallery.</div>';
-  } else {
-    list.innerHTML=state.archiveItems.map((item,i)=>`
-      <div class="archive-item" onclick="replayFromArchive(${i})">
-        <span class="envelope">${item.type==='pending'?'✉️':'💌'}</span>
-        <div class="item-info">
-          <div>${item.label}</div>
-          <div style="font-size:0.8rem;opacity:0.6;margin-top:0.2rem">${item.desc}</div>
-          <div class="item-date">${item.time}</div>
-        </div>
-      </div>`).join('');
-  }
-  duckAudio();document.getElementById('archive-panel').classList.add('open');syncModalLayer();
+  duckAudio();
+  renderArchive();
+  document.getElementById('archive-panel').classList.add('open');
+  syncModalLayer();
 }
-function replayFromArchive(){closeArchive();openVideoLetter();}
+
+function renderArchive(){
+  const pending = getMissedVideos();
+  const viewed  = getViewedVideos();
+
+  // Tab buttons
+  document.getElementById('archive-tab-pending').classList.toggle('active', archiveTab==='pending');
+  document.getElementById('archive-tab-viewed').classList.toggle('active',  archiveTab==='viewed');
+
+  const list = document.getElementById('archive-list');
+
+  if(archiveTab==='pending'){
+    if(!pending.length){
+      list.innerHTML='<div class="archive-empty">No missed or unfinished letters.<br><br>Keep exploring the gallery...</div>';
+    } else {
+      list.innerHTML = pending.map(v=>`
+        <div class="archive-item" onclick="replayFromArchive(${v.index})">
+          <span class="envelope">${v.status==='unfinished'?'✉️':'💌'}</span>
+          <div class="item-info">
+            <div>${v.status==='unfinished'?'Unfinished Letter':'Missed Letter'}</div>
+            <div style="font-size:0.8rem;opacity:0.6;margin-top:0.2rem">
+              ${v.status==='unfinished'?'Tap to finish watching':'It floated away — tap to watch'}
+            </div>
+            <div class="item-date">${v.time||''}</div>
+          </div>
+        </div>`).join('');
+    }
+  } else {
+    if(!viewed.length){
+      list.innerHTML='<div class="archive-empty">No viewed letters yet.<br><br>Catch a floating letter to watch it.</div>';
+    } else {
+      list.innerHTML = viewed.map(v=>`
+        <div class="archive-item" onclick="replayFromArchive(${v.index})">
+          <span class="envelope">💝</span>
+          <div class="item-info">
+            <div>Letter #${v.index+1}</div>
+            <div style="font-size:0.8rem;opacity:0.6;margin-top:0.2rem">Tap to watch again</div>
+            <div class="item-date">${v.time||''}</div>
+          </div>
+        </div>`).join('');
+    }
+  }
+}
+
+function switchArchiveTab(tab){
+  archiveTab=tab;
+  renderArchive();
+}
+
 function closeArchive(){
   document.getElementById('archive-panel').classList.remove('open');
   syncModalLayer();
@@ -1604,6 +1807,8 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 // ═══════════════════════════════════════
 let doorOpen=false;
 function enterMuseum(){
+  // initAudio HERE — this tap is the user gesture iOS needs for autoplay
+  initAudio();
   document.getElementById('landing').classList.add('fade-out');
   setTimeout(()=>{
     document.getElementById('landing').style.display='none';
