@@ -468,7 +468,20 @@
   </div>
 </section>
 
+<audio id="bg-music" loop>
+  <source src="your%20love.m4a" type="audio/mp4">
+</audio>
+
 <script>
+  const music = document.getElementById('bg-music');
+
+function startMusic() {
+  music.play().catch(() => {});
+  document.removeEventListener('click', startMusic);
+}
+
+document.addEventListener('click', startMusic);
+
   // Stars
   const starWrap = document.getElementById('stars');
   for(let i=0;i<100;i++){
