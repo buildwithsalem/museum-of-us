@@ -777,7 +777,7 @@
 <!-- EXIT GATE -->
 <div id="exit-gate">
   <div class="exit-gate-card">
-    <div class="exit-gate-title">Wait — there are letters for you 💌</div>
+    <div class="exit-gate-title">Wait! there are letters for you 💌</div>
     <div class="exit-gate-body">
       You have <strong id="exit-gate-unseen">0</strong> unseen letter(s) and
       <strong id="exit-gate-missed">0</strong> missed/unfinished letter(s) still waiting.<br><br>
@@ -806,7 +806,7 @@
 
   // Build the full list of paths
   const allPaths = Array.from({length: total}, (_, i) =>
-    `landing/${String(i + 1).padStart(3, '0')}.jpg`
+    `landing/${String(i + 1).padStart(3, '0')}.jpeg`
   );
 
   // Shuffle so they don't always appear in the same order
