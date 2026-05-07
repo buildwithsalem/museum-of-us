@@ -1220,44 +1220,6 @@ scene.add(aprSpot);scene.add(aprSpot.target);frameSpots.push(aprSpot);
 // ═══════════════════════════════════════
 let audioCtx=null,masterGain=null,chatterGain=null,ambienceEl=null;
 
-// ─ SPOTIFY MINI PLAYER ─
-let spotifyInjected=false;
-let spotifyVisible=false;
-function injectSpotify(){
-  if(spotifyInjected)return;
-  spotifyInjected=true;
-  // Spotify embed: must be at least 80px tall & visible for autoplay to fire
-  const wrap=document.createElement('div');
-  wrap.id='spotify-wrap';
-  wrap.style.cssText='position:fixed;bottom:calc(2rem + env(safe-area-inset-bottom));left:1.2rem;z-index:70;border-radius:12px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.7);opacity:0;transform:translateY(12px);transition:opacity 0.6s ease,transform 0.6s ease;pointer-events:none;';
-  const iframe=document.createElement('iframe');
-  // compact embed (152px) is the minimum Spotify respects for autoplay
-  iframe.src='https://open.spotify.com/embed/playlist/1jBkRxzuhxLXxJ464qyqiP?utm_source=generator&autoplay=1&theme=0';
-  iframe.width='260';iframe.height='152';
-  iframe.style.cssText='border:none;display:block;';
-  iframe.allow='autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
-  iframe.allowFullscreen=true;
-  wrap.appendChild(iframe);
-  document.body.appendChild(wrap);
-  // Slide it in after a moment so it doesn't clash with landing
-  // Player starts hidden — user toggles it with the music button
-  spotifyVisible=false;
-}
-function toggleSpotify(){
-  const wrap=document.getElementById('spotify-wrap');
-  const btn=document.getElementById('music-btn');
-  if(!wrap)return;
-  if(spotifyVisible){
-    wrap.style.opacity='0';wrap.style.transform='translateY(12px)';wrap.style.pointerEvents='none';
-    spotifyVisible=false;
-    if(btn){ btn.style.opacity='0.55'; btn.title='Show music player'; }
-  } else {
-    wrap.style.opacity='1';wrap.style.transform='translateY(0)';wrap.style.pointerEvents='all';
-    spotifyVisible=true;
-    if(btn){ btn.style.opacity='1'; btn.title='Hide music player'; }
-  }
-}
-
 function initAudio(){
   if(audioCtx)return;
 
