@@ -802,7 +802,7 @@
 // ═══════════════════════════════════════
 (function initLandingSmack(){
   const container = document.getElementById('landing-photos');
-  const total = 80;
+  const total = 70;
 
   // Build the full list of paths
   const allPaths = Array.from({length: total}, (_, i) =>
@@ -854,12 +854,12 @@
 
       // Frame 1: smack in fast
       requestAnimationFrame(() => {
-        img.style.transition = 'transform 0.16s cubic-bezier(0.22,1,0.36,1)';
+        img.style.transition = 'transform 0.05s cubic-bezier(0.22,1,0.36,1)';
         img.style.transform = `rotate(${rot}deg) scale(1.05) translateY(0px)`;
 
         // Frame 2: tiny settle bounce
         setTimeout(() => {
-          img.style.transition = 'transform 0.1s cubic-bezier(0.4,0,0.6,1)';
+          img.style.transition = 'transform 0.03s cubic-bezier(0.4,0,0.6,1)';
           img.style.transform  = `rotate(${rot}deg) scale(1) translateY(0px)`;
         }, 160);
       });
