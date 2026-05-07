@@ -626,7 +626,7 @@
     <div class="landing-eyebrow">A Private Exhibition</div>
     <div class="landing-title">Museum<br>of Us</div>
     <div class="landing-rule"></div>
-    <div class="landing-sub">april 2025 — april 2026</div>
+    <div class="landing-sub">may 2025 — may 2026</div>
     <button class="enter-btn" onclick="enterMuseum()">Enter the Gallery</button>
   </div>
 </div>
@@ -788,129 +788,109 @@
 <script>
 
 // ═══════════════════════════════════════
-//  LANDING PHOTO RAIN
-//  Photos pop in at random positions, sizes, and rotations.
-//  Some overlap — that's intentional, like a scattered gallery wall.
+//  LANDING PHOTO SMACK
+//  Files live in landing/001.jpg → landing/080.jpg
+//  (zero-padded 3 digits, e.g. 001, 002 ... 010 ... 080)
+//  Photos that exist smack on. Missing ones are silently skipped.
+//  No fallback — the landing/ folder IS the source.
 // ═══════════════════════════════════════
-// ═══════════════════════════════════════
-//  LANDING PHOTO SMACK ANIMATION
-//
-//  Photos slam onto the wall one at a time with a snap/smack feel:
-//  they start off-screen or at scale 0, fly in fast, then settle
-//  with a little bounce — like someone physically pinning them up.
-//
-//  HOW TO ADD YOUR 80 PHOTOS:
-//  1. Create a folder called  landing/  next to index.html
-//  2. Put your photos in it named: 001.jpg, 002.jpg ... 080.jpg
-//     (or any names — update the list below)
-//  3. They'll smack onto the screen automatically in random order.
-//
-//  The museum photos (media/) are used as fallback if landing/ doesn't exist.
-// ═══════════════════════════════════════
-
-// ── Populate this list with your 70 landing photos ──
-// Format: 'landing/yourfilename.jpg'
-// We pre-populate 70 slots; add real filenames as you add photos.
-const LANDING_PHOTOS_70 = Array.from({length:70}, (_,i) => `landing/${String(i+1).padStart(3,'0')}.jpg`);
-
-// Fallback to museum photos if landing/ folder isn't set up yet
-const LANDING_PHOTOS_FALLBACK = [
-  'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778097959/first_pic.png','https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098428/sept.jpg','https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098430/oct.jpg','https://res.cloudinary.com/dzgabvxwv/image/upload/v1778097962/nov.jpg',
-  'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098429/dec.jpg','https://res.cloudinary.com/dzgabvxwv/image/upload/v1778097960/jan.jpg','https://res.cloudinary.com/dzgabvxwv/image/upload/v1778097958/feb.jpg','https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098427/mar.jpg',
-  'https://res.cloudinary.com/dzgabvxwv/image/upload/v1778097959/first_actual.jpg','https://res.cloudinary.com/dzgabvxwv/image/upload/v1778098432/imnotsleepy.jpg',
-];
-
-(function initLandingSmack() {
+(function initLandingSmack(){
   const container = document.getElementById('landing-photos');
-  let pool = [...LANDING_PHOTOS_70].sort(()=>Math.random()-.5);
-  let loadedCount = 0;
-  let smackQueue = [];
-  let smacking = false;
+  const total = 80;
 
-  // Test if landing/ photos exist; fall back gracefully
-  function testAndLoad(src, onSuccess, onFail) {
-    const img = new Image();
-    img.onload = () => onSuccess(img);
-    img.onerror = () => onFail();
+  // Build the full list of paths
+  const allPaths = Array.from({length: total}, (_, i) =>
+    `landing/${String(i + 1).padStart(3, '0')}.jpg`
+  );
+
+  // Shuffle so they don't always appear in the same order
+  const shuffled = allPaths.sort(() => Math.random() - 0.5);
+
+  // Photo size variants — mix portrait, square, landscape
+  const sizes = [
+    {w:110,h:145},{w:130,h:170},{w:150,h:195},{w:125,h:125},
+    {w:170,h:135},{w:140,h:180},{w:115,h:150},{w:160,h:200},
+    {w:120,h:155},{w:145,h:115},
+  ];
+
+  let smackCount = 0;
+
+  function smackPhoto(src, idx) {
+    const img = document.createElement('img');
+    img.decoding = 'async';
+
+    // Only add to DOM if the image actually loads
+    img.onload = () => {
+      const sz = sizes[smackCount % sizes.length];
+      const rot = ((smackCount * 37 + Math.random() * 8 - 4) % 22 - 11).toFixed(1);
+      const left = (3 + Math.random() * 86).toFixed(1);
+      const top  = (3 + Math.random() * 83).toFixed(1);
+      const z    = 1 + (smackCount % 5);
+
+      img.style.cssText = `
+        width:${sz.w}px; height:${sz.h}px;
+        left:${left}%; top:${top}%;
+        transform: rotate(${Number(rot) * 2.8}deg) scale(0) translateY(-20px);
+        transform-origin: center center;
+        transition: none;
+        z-index: ${z};
+        position: absolute;
+        object-fit: cover;
+        border: 1px solid rgba(201,168,76,0.3);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.8), 2px 2px 0 rgba(0,0,0,0.4);
+        filter: brightness(0.58) saturate(0.72) sepia(0.1);
+        border-radius: 1px;
+        opacity: 1;
+      `;
+
+      container.appendChild(img);
+      smackCount++;
+
+      // Frame 1: smack in fast
+      requestAnimationFrame(() => {
+        img.style.transition = 'transform 0.16s cubic-bezier(0.22,1,0.36,1)';
+        img.style.transform = `rotate(${rot}deg) scale(1.05) translateY(0px)`;
+
+        // Frame 2: tiny settle bounce
+        setTimeout(() => {
+          img.style.transition = 'transform 0.1s cubic-bezier(0.4,0,0.6,1)';
+          img.style.transform  = `rotate(${rot}deg) scale(1) translateY(0px)`;
+        }, 160);
+      });
+
+      // Keep DOM under control — remove oldest once 55 are on screen
+      const all = container.querySelectorAll('img');
+      if(all.length > 55){
+        const oldest = all[0];
+        oldest.style.transition = 'opacity 0.3s ease';
+        oldest.style.opacity = '0';
+        setTimeout(() => oldest.remove(), 300);
+      }
+    };
+
+    // onerror: silently skip missing photos — no fallback, no console noise
+    img.onerror = () => {};
     img.src = src;
   }
 
-  // Check first photo; if it 404s, use fallback list
-  testAndLoad(pool[0], () => startSmacking(pool), () => startSmacking(LANDING_PHOTOS_FALLBACK));
+  // Phase 1: rapid-fire — smack one every 220ms through the full shuffled list
+  let idx = 0;
+  const rapidInterval = setInterval(() => {
+    if(idx >= shuffled.length){ clearInterval(rapidInterval); slowPhase(); return; }
+    smackPhoto(shuffled[idx], idx);
+    idx++;
+  }, 220);
 
-  function startSmacking(photoList) {
-    // Shuffle
-    const shuffled = [...photoList].sort(()=>Math.random()-.5);
-    let idx = 0;
-    // Smack one photo every 100ms, cycling through the list
-    const interval = setInterval(() => {
-      smackPhoto(shuffled[idx % shuffled.length], idx);
-      idx++;
-      // After going through all photos, slow down to 1 per 600ms to keep it alive
-      if(idx >= shuffled.length) clearInterval(interval), slowSmack(shuffled);
-    }, 100);
-  }
-
-  function slowSmack(list) {
-    let idx = 0;
+  // Phase 2: slow drip after all photos have gone through once — keeps it alive
+  function slowPhase(){
+    const reshuffled = [...shuffled].sort(() => Math.random() - 0.5);
+    let si = 0;
     setInterval(() => {
-      smackPhoto(list[idx % list.length], idx + 999);
-      idx++;
-    }, 600);
+      smackPhoto(reshuffled[si % reshuffled.length], si + 999);
+      si++;
+    }, 1400);
   }
-
-  function smackPhoto(src, idx) {
-    const el = document.createElement('img');
-    el.src = src;
-    el.className = 'l-photo';
-
-    // Random size: portrait, landscape, or square polaroid-ish
-    const sizes = [
-      {w:120,h:150},{w:140,h:175},{w:160,h:200},{w:130,h:130},
-      {w:180,h:140},{w:110,h:140},{w:170,h:210},{w:150,h:190},
-    ];
-    const sz = sizes[idx % sizes.length];
-    const rot = (Math.random() * 22 - 11).toFixed(1); // -11° to +11°
-    const left = (3 + Math.random() * 87).toFixed(1);
-    const top  = (3 + Math.random() * 85).toFixed(1);
-
-    // Apply smack CSS — starts with scale(0) rotated more, transitions to resting pose
-    el.style.cssText = `
-      width:${sz.w}px; height:${sz.h}px;
-      left:${left}%; top:${top}%;
-      transform: rotate(${Number(rot)*2.5}deg) scale(0) translateY(-30px);
-      transform-origin: center center;
-      transition: none;
-      z-index: ${2 + (idx % 4)};
-    `;
-
-    container.appendChild(el);
-
-    // Frame 1: trigger the smack
-    requestAnimationFrame(() => {
-      el.style.transition = 'transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.1s ease';
-      el.style.opacity = '1';
-      el.style.transform = `rotate(${rot}deg) scale(1.06) translateY(0px)`;
-
-      // Frame 2: settle back (tiny bounce-back)
-      setTimeout(() => {
-        el.style.transition = 'transform 0.12s cubic-bezier(0.4, 0, 0.6, 1)';
-        el.style.transform = `rotate(${rot}deg) scale(1) translateY(0px)`;
-        el.classList.add('shown');
-      }, 180);
-    });
-
-    // Keep DOM tidy — remove very old photos if too many pile up
-    const children = container.children;
-    if(children.length > 60) {
-      // Fade out and remove the oldest
-      const oldest = children[0];
-      oldest.style.transition = 'opacity 0.4s ease';
-      oldest.style.opacity = '0';
-      setTimeout(() => oldest.remove(), 400);
-    }
-  }
-})();
+}());
 
 
 // ═══════════════════════════════════════
